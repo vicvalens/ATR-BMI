@@ -9,6 +9,10 @@ DEFAULT_FOLDER_PATH = "participants"
 STREAM_NAMES = ['AURA_Power', 'AURA_Filtered', 'test_triggers']
 
 def initialize_b_well_stream() -> StreamInlet:
+    """
+    Creates the b_well_stream that is going to be used and makes it and inlet
+    :return: the inlet of the bWell Stream
+    """
     stream_marker = pylsl.resolve_stream('name', 'bWell.Markers')
     inlet_markers_stream = None
     if len(stream_marker) == 0:
@@ -20,14 +24,28 @@ def initialize_b_well_stream() -> StreamInlet:
 
 
 def create_streams() -> list[list[StreamInfo]]:
+    """
+    Creates the streams that are going to be used for the AURA by the size of stream names it only creates 3 streams
+    :return: a list of streams
+    """
     return [pylsl.resolve_stream('name', name) for name in STREAM_NAMES]
 
 
 def create_inlets(streams):
+    """
+    Creates a dictionary containing all the inlets.
+    :param streams: the list of streams to create inlets
+    :return: a dictionary containing all the inlets
+    """
     return {name: pylsl.StreamInlet(stream[0]) for name, stream in zip(STREAM_NAMES, streams)}
 
 
 def create_directory(participant_id):
+    """
+    Checks weather or not a directory exists and creates it if it doesn't.
+    :param participant_id: the id of the participant
+    :return: the created directory or the found directory
+    """
     folder_path = os.path.join(DEFAULT_FOLDER_PATH, participant_id)
     os.makedirs(folder_path, exist_ok=True)
     print(f"Directory: {participant_id} {'created' if not os.path.isdir(folder_path) else 'found'}")
@@ -35,17 +53,26 @@ def create_directory(participant_id):
 
 
 def check_streams(channels) -> (bool, str):
-    ok = True
-    failed = ''
+    """
+    Checks if the created streams exist or not.
+    :param channels: the list of channels to check
+    :return: a boolean indicating if the stream exists or not and a string containing the name of the fault channel,
+    in case there's no fault channel the string returned is empty
+    """
     for i in range(len(channels)):
         if len(channels[i]) == 0:
-            ok = False
-            failed = STREAM_NAMES[i]
-            break
-    return ok, failed
+            return False, STREAM_NAMES[i]
+    return True, ''
 
 
 def create_writer(folder_path, session_name, suffix=""):
+    """
+    Creates a writer for a csv file, the name given is the date of the experiment
+    :param folder_path: the path where the CSV will be created
+    :param session_name: The name of the session
+    :param suffix: modifier depending on the channel
+    :return: A tuple containing the writer, path and file
+    """
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     filename = f"{session_name}_{suffix}_{now}.csv" if suffix else f"{session_name}_{now}.csv"
     csv_path = os.path.join(folder_path, filename)
@@ -54,6 +81,14 @@ def create_writer(folder_path, session_name, suffix=""):
 
 
 def process_trigger(trigger, participant_id, session_name, recording_state):
+    """
+    Handles the different states of the signals
+    :param trigger: Incoming trigger data
+    :param participant_id: Current participant ID
+    :param session_name: Current session name
+    :param recording_state: A dictionary keeping track whether the recording is in progress or not
+    :return: A tuple containing the trigger label, participant ID, session name, recording state and bWell.Markers inlet
+    """
     if ':' not in str(trigger[0]):
         return trigger, participant_id, session_name, recording_state, None
 
@@ -75,6 +110,10 @@ def process_trigger(trigger, participant_id, session_name, recording_state):
     return "0", participant_id, session_name, recording_state, None
 
 def run():
+    """
+    Entry point to the scripts in this file
+    :return: None
+    """
     print("Solving Streams")
     streams = create_streams()
     ok, failed_stream = check_streams(streams)
@@ -139,5 +178,3 @@ def run():
         if bwell_markers_inlet:
             bwell_markers_inlet.close_stream()
         writers.clear()
-
-run()
