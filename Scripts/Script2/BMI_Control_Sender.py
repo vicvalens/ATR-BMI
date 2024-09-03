@@ -23,7 +23,7 @@ if len(canales) == 0:
 entrada = pylsl.StreamInlet(canales[0])
 print("Esperando datos desde el stream 'AURA_Power'...")
 
-model= BMI_Calibration('fishing.csv')
+model= BMI_Calibration('../../fishing.csv')
 
 sample_list = []
 while True:

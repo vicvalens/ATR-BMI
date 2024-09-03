@@ -1,5 +1,6 @@
 from pylsl import resolve_streams
 
+# Debug Code
 def detectar_senales_lsl():
     # Buscar todas las señales LSL disponibles en la red
     streams = resolve_streams()

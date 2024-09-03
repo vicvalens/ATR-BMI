@@ -6,7 +6,7 @@ ruta_codigo1 = "main_EEG_Trigger_saver_EEG.py"
 ruta_codigo2 = "main_trigger_server_Cognitive_Training_Group.py"
 ruta_codigo3 = "dummyStream.py"
 
-# Abrir código 1 en una nueva terminal (para Windows)
+# Abrir código 1 en una nueva terminal (para Windows)La f
 os.system(f"start cmd /c python {ruta_codigo1}")
 
 # Esperar 2 segundos

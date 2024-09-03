@@ -40,7 +40,7 @@ def delete_typed_keys():
     backspace_num=0
 
 def display_menu():
-    print("***************** Cognitive Trining Menu *****************")
+    print("***************** Cognitive Training Menu *****************")
     print("Select bWell excercise")
     print("1. Egg: Attention")
     print("2. Theater: Working Memory")
@@ -124,7 +124,7 @@ def fishing_multitasking_bmi():
     directory=os.path.join(directory,participation_id)
     source_filename=search_and_copy(directory)
     print(source_filename)
-    shutil.copyfile(source_filename, "fishing.csv")
+    shutil.copyfile(source_filename, "../../fishing.csv")
     print(f'File {source_filename} has been copied as fishing.csv')
 
     #Start Calibration and Execution
@@ -212,6 +212,7 @@ def confirm_experiment():
         #print("Terminating program...")
     else:
         print("Invalid input, please enter 'y' for yes or 'n' for no.")
+        # return function does not return anything
 
 def get_send_participant_code():
     global participation_id
