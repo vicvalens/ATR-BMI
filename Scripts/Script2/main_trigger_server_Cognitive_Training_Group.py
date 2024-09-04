@@ -124,7 +124,7 @@ def fishing_multitasking_bmi():
     directory=os.path.join(directory,participation_id)
     source_filename=search_and_copy(directory)
     print(source_filename)
-    shutil.copyfile(source_filename, "../../fishing.csv")
+    shutil.copyfile(source_filename, "../../Data/fishing.csv")
     print(f'File {source_filename} has been copied as fishing.csv')
 
     #Start Calibration and Execution

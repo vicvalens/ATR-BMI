@@ -2,9 +2,9 @@ import os
 import time
 
 # Ruta de los dos códigos Python que deseas ejecutar
-ruta_codigo1 = "main_EEG_Trigger_saver_EEG.py"
-ruta_codigo2 = "main_trigger_server_Cognitive_Training_Group.py"
-ruta_codigo3 = "dummyStream.py"
+ruta_codigo1 = "Scripts/Script1/main_eeg_trigger_saver_eeg_refactored.py"
+ruta_codigo2 = "Scripts/Script2/main_trigger_server_Cognitive_Training_Group.py"
+ruta_codigo3 = "Scripts/Script3/dummyStream.py"
 
 # Abrir código 1 en una nueva terminal (para Windows)La f
 os.system(f"start cmd /c python {ruta_codigo1}")

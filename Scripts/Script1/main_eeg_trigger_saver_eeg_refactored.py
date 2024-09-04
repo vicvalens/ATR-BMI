@@ -178,3 +178,5 @@ def run():
         if bwell_markers_inlet:
             bwell_markers_inlet.close_stream()
         writers.clear()
+
+run()

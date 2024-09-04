@@ -7,8 +7,8 @@ from sklearn.preprocessing import MinMaxScaler
 
 def Logistic_Regression():
 	# Load the datasets
-	multitask = pd.read_csv('multitask.csv').assign(Label=-1)
-	bmi = pd.read_csv('bmi.csv').assign(Label=1)
+	multitask = pd.read_csv('Data/multitask.csv').assign(Label=-1)
+	bmi = pd.read_csv('Data/bmi.csv').assign(Label=1)
 
 	# Concatenate the datasets
 	df = pd.concat([multitask, bmi])
