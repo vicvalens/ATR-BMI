@@ -23,7 +23,7 @@ def initialize_b_well_stream() -> StreamInlet:
     return inlet_markers_stream
 
 
-def create_streams() -> list[list[StreamInfo]]:
+def create_streams():
     """
     Creates the streams that are going to be used for the AURA by the size of stream names it only creates 3 streams
     :return: a list of streams

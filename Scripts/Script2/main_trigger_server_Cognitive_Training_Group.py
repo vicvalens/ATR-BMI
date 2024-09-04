@@ -1,10 +1,8 @@
 import time
 from pylsl import StreamInfo, StreamOutlet
-from getpass import getpass
 import keyboard
-from search_and_copy import *
-from BMI_Calibration import *
-import os 
+from Scripts.Script2.search_and_copy import *
+import os
 import shutil
 import subprocess
 

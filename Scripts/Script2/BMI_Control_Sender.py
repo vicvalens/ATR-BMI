@@ -1,8 +1,5 @@
 import pylsl
-import csv
-import os
-from datetime import datetime
-from BMI_Calibration import *
+from Scripts.Script2.BMI_Calibration import *
 import numpy as np
 from pylsl import StreamInfo, StreamOutlet
 
