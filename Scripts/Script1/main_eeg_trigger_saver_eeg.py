@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 
 from pylsl import StreamInfo, StreamInlet
+from scipy.constants import value
 
 DEFAULT_FOLDER_PATH = "participants"
 STREAM_NAMES = ['AURA_Power', 'AURA_Filtered', 'test_triggers']
@@ -92,13 +93,16 @@ def process_trigger(trigger, participant_id, session_name, recording_state):
     if ':' not in str(trigger[0]):
         return trigger, participant_id, session_name, recording_state, None
 
-    action, value = str(trigger[0]).split(":")
+    str_split = str(trigger[0]).split(":")
+    action = str_split[0]
+    value_action = str_split[-1]
+    print(trigger[0])
     if action == "participant_id":
-        participant_id = value
+        participant_id = value_action
         folder_path = create_directory(participant_id)
         return "0", participant_id, session_name, recording_state, initialize_b_well_stream()
     elif action == "start_session":
-        session_name = value
+        session_name = value_action
         if not recording_state['is_recording']:
             recording_state['is_recording'] = True
             return f"start_session_{session_name}", participant_id, session_name, recording_state, None

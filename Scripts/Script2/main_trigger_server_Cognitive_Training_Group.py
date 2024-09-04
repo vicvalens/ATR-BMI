@@ -229,6 +229,7 @@ def get_send_participant_code():
         else:
             print("Invalid input, please enter 'y' for yes or 'n' for no.")
 
+
 def break_rest():
     mins = 2
     print("********************Start Break ********************")    
@@ -238,6 +239,7 @@ def break_rest():
     print("********************End Break ********************")    
 
 print("...Main Experiment LSL Server Started...")
+
 
 get_send_participant_code()
 
