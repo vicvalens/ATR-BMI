@@ -38,7 +38,10 @@ def create_inlets(streams):
     :param streams: the list of streams to create inlets
     :return: a dictionary containing all the inlets
     """
-    return {name: pylsl.StreamInlet(stream[0]) for name, stream in zip(STREAM_NAMES, streams)}
+    aura_power = pylsl.StreamInlet(streams[0][0])
+    aure_eeg = pylsl.StreamInlet(streams[1][0])
+    triggers = pylsl.StreamInlet(streams[2][0])
+    return {STREAM_NAMES[0]: aura_power, STREAM_NAMES[1]:aure_eeg, STREAM_NAMES[2]:triggers}
 
 
 def create_directory(participant_id):
