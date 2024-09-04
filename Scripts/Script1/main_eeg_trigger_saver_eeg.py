@@ -140,8 +140,12 @@ def run():
 
     try:
         while True:
-            samples = {name: inlet.pull_sample() for name, inlet in streams_inlets.items()}
-            triggers, _ = streams_inlets['test_triggers'].pull_sample(0)
+            aura_data, timestamp = streams_inlets[STREAM_NAMES[0]].pull_sample()
+            aura_data_eeg, timestamp_eeg = streams_inlets[STREAM_NAMES[1]].pull_sample()
+            samples = {'AURA_Power':aura_data, 'AURA_Filtered':aura_data_eeg}
+            triggers, _ = streams_inlets[STREAM_NAMES[-1]].pull_sample(0)
+            if triggers is not None:
+                print(triggers)
 
             marker_label = "0"
 
