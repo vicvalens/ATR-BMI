@@ -3,27 +3,32 @@ import pylsl
 from pylsl import StreamInlet
 
 class AuraSignalHandler:
-    __STREAM_NAMES = ['AURA_Power', 'AURA_Filtered', 'bWell.Markers']
+    __STREAM_NAMES = ['AURA_Power', 'AURA_Filtered']
 
     def __init__(self, mode):
-        print('solving streams')
         self.streams = []
         self.mode = mode
         self.writing_data = False
+        self.b_well_inlet = None
         self.inlets = {}
         self.__create_streams()
         self.stream_created_successfully, self.failed_stream = self.check_streams()
-        print(self.stream_created_successfully)
         if self.stream_created_successfully:
             for i in range(len(self.__STREAM_NAMES)):
-                if self.mode == 'FISHING' and self.__STREAM_NAMES[-1] == self.__STREAM_NAMES[i]:
-                    continue
                 self.inlets[self.__STREAM_NAMES[i]] = StreamInlet(self.streams[i][0])
+
+        if mode != 'FISHING':
+            self.__create_b_well()
+
+
+    def __create_b_well(self):
+        b_well_stream = pylsl.resolve_stream('name', 'bWell.Markers')
+
+        if len(b_well_stream) != 0:
+            self.b_well_inlet = pylsl.StreamInlet(b_well_stream[0])
 
     def __create_streams(self):
         for stream in self.__STREAM_NAMES:
-            if self.mode == 'FISHING' and self.__STREAM_NAMES[-1] == stream:
-                continue
             new_stream = pylsl.resolve_stream('name', stream)
             self.streams.append(new_stream)
 
@@ -42,14 +47,11 @@ class AuraSignalHandler:
     def get_data_from_streams(self):
         all_data = []
         for i in range(len(self.streams)):
-            if self.mode == 'FISHING' and self.__STREAM_NAMES[-1] == self.__STREAM_NAMES[i]:
-                continue
             inlet_data, timestamp = self.inlets[self.__STREAM_NAMES[i]].pull_sample()
-            all_data.append(inlet_data)
-            print(self.__STREAM_NAMES[i])
-            print(inlet_data)
-            print(timestamp)
+            all_data.append((inlet_data, timestamp))
 
+        if self.b_well_inlet is not None:
+            all_data.append((self.b_well_inlet.pull_sample(), 0))
         return all_data
 
     def close_streams(self):

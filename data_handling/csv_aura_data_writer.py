@@ -29,9 +29,9 @@ class AuraDataWriter:
 
         return csv.writer(file), file
 
-    def write_data(self, data, data_timestamp, data_egg, data_egg_timestamp, b_well_data, status_label=''):
+    def write_data(self, data, data_timestamp, data_eeg, data_egg_timestamp, b_well_data, status_label=''):
         self.aura_writer.writerow([data_timestamp] + data + [status_label] + b_well_data)
-        self.aura_writer_eeg.writerow([data_egg_timestamp] + data_egg + [status_label] + b_well_data)
+        self.aura_writer_eeg.writerow([data_egg_timestamp] + data_eeg + [status_label] + b_well_data)
 
     def close_writer(self):
         self.aura_file.close()
