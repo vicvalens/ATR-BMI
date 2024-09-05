@@ -1,4 +1,3 @@
-from Scripts import Script1
 
 def egg_attention():
     print('egg attention')
