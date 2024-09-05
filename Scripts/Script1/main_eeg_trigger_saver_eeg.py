@@ -116,7 +116,7 @@ def process_trigger(trigger, participant_id, session_name, recording_state):
 
     return "0", participant_id, session_name, recording_state, None
 
-def run():
+def run(participant_id):
     """
     Entry point to the scripts in this file
     :return: None
@@ -128,66 +128,3 @@ def run():
         print(f"Stream '{failed_stream}' not found. Ensure it's being sent by another program.")
         return
 
-    streams_inlets = create_inlets(streams)
-    bwell_markers_inlet = None
-
-    recording_state = {'is_recording': False}
-    participant_id = ""
-    session_name = ""
-    writers = {}
-
-    print("Waiting for data from AURA_Power, AURA_Filtered, and test_triggers streams...")
-
-    try:
-        while True:
-            aura_data, timestamp = streams_inlets[STREAM_NAMES[0]].pull_sample()
-            aura_data_eeg, timestamp_eeg = streams_inlets[STREAM_NAMES[1]].pull_sample()
-            samples = {'AURA_Power':aura_data, 'AURA_Filtered':aura_data_eeg}
-            triggers, _ = streams_inlets[STREAM_NAMES[-1]].pull_sample(0)
-            if triggers is not None:
-                print(triggers)
-
-            marker_label = "0"
-
-            if bwell_markers_inlet:
-                markers, _ = bwell_markers_inlet.pull_sample(0)
-                marker_label = markers[0] if markers else "0"
-
-            trigger_label, participant_id, session_name, recording_state, new_bwell_inlet = process_trigger(
-                triggers or ["0"], participant_id, session_name, recording_state
-            )
-
-            if new_bwell_inlet:
-                bwell_markers_inlet = new_bwell_inlet
-
-            if trigger_label == "exit":
-                print("Finished")
-                break
-
-            if recording_state['is_recording']:
-                if not writers:
-                    folder_path = create_directory(participant_id)
-                    writers['aura'], _, aura_file = create_writer(folder_path, session_name)
-                    writers['eeg'], _, eeg_file = create_writer(folder_path, session_name, "eeg")
-                    print("Recording started...")
-                for stream_type, (sample, timestamp) in samples.items():
-                    if stream_type in ['AURA_Power', 'AURA_Filtered']:
-                        writers[stream_type.split('_')[1].lower()].writerow(
-                            [timestamp] + sample + [trigger_label, marker_label])
-
-            elif writers:
-                for file in [aura_file, eeg_file]:
-                    file.close()
-                writers.clear()
-                print("Recording finished...")
-    finally:
-        # Close any open files and inlets
-        for file in [aura_file, eeg_file]:
-            file.close()
-        for inlet in streams_inlets.values():
-            inlet.close_stream()
-        if bwell_markers_inlet:
-            bwell_markers_inlet.close_stream()
-        writers.clear()
-
-run()
