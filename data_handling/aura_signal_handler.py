@@ -1,29 +1,29 @@
 import pylsl
 
-from data_handling.csv_aura_data_writer import AuraDataWriter
-from pylsl import StreamInfo, StreamInlet
+from pylsl import StreamInlet
 
 class AuraSignalHandler:
     __STREAM_NAMES = ['AURA_Power', 'AURA_Filtered', 'bWell.Markers']
 
-    def __init__(self, participant_id, mode):
-        self.data_handler = AuraDataWriter(participant_id)
+    def __init__(self, mode):
+        print('solving streams')
         self.streams = []
         self.mode = mode
         self.writing_data = False
         self.inlets = {}
         self.__create_streams()
         self.stream_created_successfully, self.failed_stream = self.check_streams()
-
+        print(self.stream_created_successfully)
         if self.stream_created_successfully:
             for i in range(len(self.__STREAM_NAMES)):
                 if self.mode == 'FISHING' and self.__STREAM_NAMES[-1] == self.__STREAM_NAMES[i]:
                     continue
                 self.inlets[self.__STREAM_NAMES[i]] = StreamInlet(self.streams[i][0])
 
-
     def __create_streams(self):
         for stream in self.__STREAM_NAMES:
+            if self.mode == 'FISHING' and self.__STREAM_NAMES[-1] == stream:
+                continue
             new_stream = pylsl.resolve_stream('name', stream)
             self.streams.append(new_stream)
 
