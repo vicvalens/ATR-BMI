@@ -30,9 +30,23 @@ class AuraDataWriter:
         return csv.writer(file), file
 
     def write_data(self, data, data_timestamp, data_eeg, data_egg_timestamp, b_well_data, status_label=''):
+        """
+        Writes the data to a csv file of the current session.
+        :param data: data from AURA power stream
+        :param data_timestamp: timestamp of the data from AURA power stream
+        :param data_eeg: data from AURA EEG stream
+        :param data_egg_timestamp: timestamp of the data from AURA EEG stream
+        :param b_well_data: Data from bWell stream if available
+        :param status_label: signal of experiment status
+        :return: None
+        """
         self.aura_writer.writerow([data_timestamp] + data + [status_label] + b_well_data)
         self.aura_writer_eeg.writerow([data_egg_timestamp] + data_eeg + [status_label] + b_well_data)
 
     def close_writer(self):
+        """
+        Closes the files of the CSVs that are being written.
+        :return: None
+        """
         self.aura_file.close()
         self.aura_eeg_file.close()

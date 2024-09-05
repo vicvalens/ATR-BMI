@@ -6,6 +6,10 @@ class AuraSignalHandler:
     __STREAM_NAMES = ['AURA_Power', 'AURA_Filtered']
 
     def __init__(self, mode):
+        """
+        Creates a new object that is used to manage the Signals from different streams. The
+        :param mode:
+        """
         self.streams = []
         self.mode = mode
         self.writing_data = False
@@ -22,12 +26,21 @@ class AuraSignalHandler:
 
 
     def __create_b_well(self):
+        """
+        If needed this function creates a b-well stream for the modes that requiere this data.
+        :return: None
+        """
         b_well_stream = pylsl.resolve_stream('name', 'bWell.Markers')
 
         if len(b_well_stream) != 0:
             self.b_well_inlet = pylsl.StreamInlet(b_well_stream[0])
 
     def __create_streams(self):
+        """
+        Creates the streams related to aura connections, if more channels are desired they must be added to the
+        `__STREAM_NAMES` list.
+        :return: None
+        """
         for stream in self.__STREAM_NAMES:
             new_stream = pylsl.resolve_stream('name', stream)
             self.streams.append(new_stream)
@@ -45,6 +58,11 @@ class AuraSignalHandler:
         return True, ''
 
     def get_data_from_streams(self):
+        """
+        Gets data from the streams. one piece at the time, if the bWell channel is open also gets the data from this
+        inlet.
+        :return: Data gathered from the streams in the form of a list of tuples of an array of floats and a timestamp.
+        """
         all_data = []
         for i in range(len(self.streams)):
             inlet_data, timestamp = self.inlets[self.__STREAM_NAMES[i]].pull_sample()
@@ -55,5 +73,12 @@ class AuraSignalHandler:
         return all_data
 
     def close_streams(self):
+        """
+        Terminates connection with the streams in the current session.
+        :return: None
+        """
         for _, inlet in self.inlets.items():
             inlet.close_stream()
+
+        if self.b_well_inlet is not None:
+            self.b_well_inlet.close_stream()
