@@ -21,33 +21,33 @@ participation_id=""
 
 script_path = 'BMI_Control_Sender.py'
 
-def read_keyboard(event):
-    global backspace_num
-    if reading_keyboard==True:
-        tecla = event.name
-        if tecla in [str(i) for i in range(1, 10)]:
-            tecla="trigger_"+tecla        
-        outlet.push_sample([tecla])
-        print("Trigger sent: "+tecla)
-        backspace_num=backspace_num+1
+# def read_keyboard(event):
+#     global backspace_num
+#     if reading_keyboard==True:
+#         tecla = event.name
+#         if tecla in [str(i) for i in range(1, 10)]:
+#             tecla="trigger_"+tecla
+#         outlet.push_sample([tecla])
+#         print("Trigger sent: "+tecla)
+#         backspace_num=backspace_num+1
 
-def delete_typed_keys():
-    global backspace_num
-    for _ in range(backspace_num):
-        keyboard.press_and_release('backspace')
-    backspace_num=0
-
-def display_menu():
-    print("***************** Cognitive Training Menu *****************")
-    print("Select bWell excercise")
-    print("1. Egg: Attention")
-    print("2. Theater: Working Memory")
-    print("3. Mole: Control and Inhibition")
-    print("4. Fishing: Multitasking + BMI")
-    print("5. Exit")
-    print("****************************************")
-    option = int(input("Option: "))
-    return option
+# def delete_typed_keys():
+#     global backspace_num
+#     for _ in range(backspace_num):
+#         keyboard.press_and_release('backspace')
+#     backspace_num=0
+#
+# def display_menu():
+#     print("***************** Cognitive Training Menu *****************")
+#     print("Select bWell excercise")
+#     print("1. Egg: Attention")
+#     print("2. Theater: Working Memory")
+#     print("3. Mole: Control and Inhibition")
+#     print("4. Fishing: Multitasking + BMI")
+#     print("5. Exit")
+#     print("****************************************")
+#     option = int(input("Option: "))
+#     return option
 
 # Send words function
 def theater_trial_routine():
@@ -144,19 +144,6 @@ def fishing_multitasking_bmi():
     print("sending: end_session:fishing_evaluation")
     print("End fishing Calibration routine")
 
-def tent_relaxation():
-    mins = int(input("How many minutes? "))
-    print("Press Enter to start Tent session...")
-    input()  # Wait for user input
-    outlet.push_sample(["start_session:tent"])  # start_experiment
-    print("sending: session_tent_relaxation")    
-    for i in range(mins):
-        print("----> Min "+str(i+1))
-        time.sleep(10)
-    outlet.push_sample(["end_session:tent"])  # start_experiment
-    print("sending: end_session:tent")
-    print("End tent_relaxation routine")
-
 def mole_control_inhibition():
     mins = int(input("How many minutes? "))
     print("Press Enter to start Mole session...")
@@ -170,26 +157,13 @@ def mole_control_inhibition():
     print("sending: end_session:mole")
     print("End mole_control_inhibition routine")
 
-def lab_multitasking():
-    mins = int(input("How many minutes? "))
-    print("Press Enter to start Lab session...")
-    input()  # Wait for user input
-    outlet.push_sample(["start_session:lab"])  # start_experiment
-    print("sending: start_session:lab")    
-    for i in range(mins):
-        print("----> Min "+str(i+1))
-        time.sleep(60)
-    outlet.push_sample(["end_session:lab"])  # start_experiment
-    print("sending: end_session:lab")
-    print("End lab_multitasking routine")
-
 def egg_attention():
-    global reading_keyboard
+    # global reading_keyboard
     mins = int(input("How many minutes? "))
     print("Press Enter to start Egg session...")
-    input()  # Wait for user input
-    reading_keyboard=True
-    keyboard.on_press(read_keyboard)    
+    # input()  # Wait for user input
+    # reading_keyboard=True
+    # keyboard.on_press(read_keyboard)
     outlet.push_sample(["start_session:egg"])  # start_experiment
     print("sending: session_egg_attention")
     for i in range(mins):
@@ -198,94 +172,119 @@ def egg_attention():
     outlet.push_sample(["end_session:egg"])  # start_experiment
     print("sending: end_session:egg")
     print("End egg_attention routine")
-    reading_keyboard=False
-    delete_typed_keys()
-
-def confirm_experiment():
-    ans = input("Do you want start_experiment? (y/n): ")
-    if ans.lower() == 'y':
-        return ans.lower()
-    elif ans.lower() == 'n':
-        return ans.lower()
-        #print("Terminating program...")
-    else:
-        print("Invalid input, please enter 'y' for yes or 'n' for no.")
-        # return function does not return anything
-
-def get_send_participant_code():
-    global participation_id
-    while True:
-        code = input("Type participant ID: ")
-        participation_id=code
-        code_trigger="participant_id:"+str(code)        
-        print("ID entered:"+code_trigger)
-        ans = input("is the ID correct? (y/n): ")
-        if ans.lower() == 'y':
-            outlet.push_sample([code_trigger])
-            print(code_trigger+" sent")
-            break
-        elif ans.lower() == 'n':
-            continue
-        else:
-            print("Invalid input, please enter 'y' for yes or 'n' for no.")
+    # reading_keyboard=False
+    # delete_typed_keys()
 
 
 def break_rest():
     mins = 2
-    print("********************Start Break ********************")    
+    print("********************Start Break ********************")
     for i in range(mins):
         print("Break ----> Min "+str(i+1))
         time.sleep(60)
-    print("********************End Break ********************")    
+    print("********************End Break ********************")
 
-print("...Main Experiment LSL Server Started...")
+# def lab_multitasking():
+#     mins = int(input("How many minutes? "))
+#     print("Press Enter to start Lab session...")
+#     input()  # Wait for user input
+#     outlet.push_sample(["start_session:lab"])  # start_experiment
+#     print("sending: start_session:lab")
+#     for i in range(mins):
+#         print("----> Min "+str(i+1))
+#         time.sleep(60)
+#     outlet.push_sample(["end_session:lab"])  # start_experiment
+#     print("sending: end_session:lab")
+#     print("End lab_multitasking routine")
+# def confirm_experiment():
+#     ans = input("Do you want start_experiment? (y/n): ")
+#     if ans.lower() == 'y':
+#         return ans.lower()
+#     elif ans.lower() == 'n':
+#         return ans.lower()
+#         #print("Terminating program...")
+#     else:
+#         print("Invalid input, please enter 'y' for yes or 'n' for no.")
+#         # return function does not return anything
+#
+# def get_send_participant_code():
+#     global participation_id
+#     while True:
+#         code = input("Type participant ID: ")
+#         participation_id=code
+#         code_trigger="participant_id:"+str(code)
+#         print("ID entered:"+code_trigger)
+#         ans = input("is the ID correct? (y/n): ")
+#         if ans.lower() == 'y':
+#             outlet.push_sample([code_trigger])
+#             print(code_trigger+" sent")
+#             break
+#         elif ans.lower() == 'n':
+#             continue
+#         else:
+#             print("Invalid input, please enter 'y' for yes or 'n' for no.")
+# def tent_relaxation():
+#     mins = int(input("How many minutes? "))
+#     print("Press Enter to start Tent session...")
+#     input()  # Wait for user input
+#     outlet.push_sample(["start_session:tent"])  # start_experiment
+#     print("sending: session_tent_relaxation")
+#     for i in range(mins):
+#         print("----> Min "+str(i+1))
+#         time.sleep(10)
+#     outlet.push_sample(["end_session:tent"])  # start_experiment
+#     print("sending: end_session:tent")
+#     print("End tent_relaxation routine")
 
 
-get_send_participant_code()
-
-while True:
-
-    option=display_menu()
+# print("...Main Experiment LSL Server Started...")
 
 
-    if option == 1:
-        print("You selected: Egg: Attention")
-        confirmation=confirm_experiment()
-        if confirmation=='y':
-            egg_attention()
-            break_rest()
-        else:
-            print("Going back to menu...")        
-    elif option == 2:
-        print("You selected: Theater: Working Memory")
-        confirmation=confirm_experiment()
-        if confirmation=='y':
-            theather_memory()
-            break_rest()
-        else:
-            print("Going back to menu...")        
-    elif option == 3:
-        print("You selected: Mole: Control and Inhibition")
-        confirmation=confirm_experiment()
-        if confirmation=='y':
-            mole_control_inhibition()
-            break_rest()
-        else:
-            print("Going back to menu...")                       
-    elif option == 4:
-        print("You selected: Fishing: Multitasking + BMI")
-        confirmation=confirm_experiment()
-        if confirmation=='y':
-            fishing_multitasking_bmi()
-            #break_rest()
-        else:
-            print("Going back to menu...")          
-    elif option == 5:
-        print("Terminating program")
-        outlet.push_sample(["exit"])
-        time.sleep(2)
-        break
-    else:
-        print("Invalid option. Please select a number between 1 and 7.")
+# get_send_participant_code()
+#
+# while True:
+#
+#     option=display_menu()
+#
+#
+#     if option == 1:
+#         print("You selected: Egg: Attention")
+#         confirmation=confirm_experiment()
+#         if confirmation=='y':
+#             egg_attention()
+#             break_rest()
+#         else:
+#             print("Going back to menu...")
+#     elif option == 2:
+#         print("You selected: Theater: Working Memory")
+#         confirmation=confirm_experiment()
+#         if confirmation=='y':
+#             theather_memory()
+#             break_rest()
+#         else:
+#             print("Going back to menu...")
+#     elif option == 3:
+#         print("You selected: Mole: Control and Inhibition")
+#         confirmation=confirm_experiment()
+#         if confirmation=='y':
+#             mole_control_inhibition()
+#             break_rest()
+#         else:
+#             print("Going back to menu...")
+#     elif option == 4:
+#         print("You selected: Fishing: Multitasking + BMI")
+#         confirmation=confirm_experiment()
+#         if confirmation=='y':
+#             fishing_multitasking_bmi()
+#             #break_rest()
+#         else:
+#             print("Going back to menu...")
+#     elif option == 5:
+#         print("Terminating program")
+#         outlet.push_sample(["exit"])
+#         time.sleep(2)
+#         break
+#     else:
+#         print("Invalid option. Please select a number between 1 and 7.")
 
 

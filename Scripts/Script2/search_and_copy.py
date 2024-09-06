@@ -11,4 +11,3 @@ def search_and_copy(directory):
     else:
         print('No CSV file containing "fishing" found in the directory')
     return source
-    
