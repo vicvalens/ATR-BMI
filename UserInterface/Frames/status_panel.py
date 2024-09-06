@@ -8,6 +8,7 @@ class StatusPanel(tk.Frame):
         super().__init__(parent, bg=self.__BACKGROUND_COLOR, height=200)
         self.terminal_frame = None
         self.create_widgets()
+        self.write_text('Panel de estado. Aquí se mostrará el estado de los experimentos que se están realizando.')
 
     def create_widgets(self):
         self.terminal_frame = tk.Text(self, bg=self.__BACKGROUND_COLOR, fg=self.__TEXT_COLOR, wrap=tk.WORD)

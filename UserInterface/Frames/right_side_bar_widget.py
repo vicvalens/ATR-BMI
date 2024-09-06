@@ -46,7 +46,6 @@ class RightControlPanel(tk.Frame):
 
 
     def set_participant_id(self):
-        print(self.get_participant_id())
         if self.get_participant_id() != '':
             self.participant_id.set(self.participant_id_entry.get())
             self.set_participant_button['state'] = tk.DISABLED
