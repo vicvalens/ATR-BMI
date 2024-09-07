@@ -9,9 +9,11 @@ class ConfirmationAndExperimentSettings(tk.Frame):
         self.details_and_configuration_frame = None
         self.value_label = None
         self.information_label = None
+        self.mode = None
         self.__experiment_duration = tk.IntVar(value=5)
 
     def egg_attention_menu(self):
+        self.mode = 'egg_attention'
         self.clear_frame()
         self.create_side_frame()
         self.create_title('Egg Attention')
@@ -20,6 +22,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
         self.create_start_button()
 
     def theater_memory_menu(self):
+        self.mode = 'theater_memory'
         self.clear_frame()
         self.create_side_frame()
         self.create_title('Theater Memory')
@@ -29,6 +32,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
 
 
     def mole_control_inhibition_menu(self):
+        self.mode = 'mole_control_inhibition'
         self.clear_frame()
         self.create_side_frame()
         self.create_title('Mole control inhibition')
@@ -38,6 +42,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
 
 
     def fishing_multitasking_bmi_menu(self):
+        self.mode = 'fishing_multitasking_bmi'
         self.clear_frame()
         self.create_side_frame()
         self.create_title('Fishing multitasking')
@@ -47,7 +52,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
 
 
     def create_start_button(self):
-        start_button = tk.Button(self.details_and_configuration_frame, text='Start experiment', fg='black', bg='#D3D3D3', height=5, width=15)
+        start_button = tk.Button(self.details_and_configuration_frame, text='Start experiment', fg='black', bg='#D3D3D3', height=5, width=15, command=self.start_experiment)
         start_button.pack(side='bottom', fill='x')
 
     def clear_frame(self):
@@ -93,3 +98,6 @@ class ConfirmationAndExperimentSettings(tk.Frame):
         )
 
         self.value_label.pack(side='top', pady=0)
+
+    def start_experiment(self):
+        print(self.mode)

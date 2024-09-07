@@ -27,8 +27,9 @@ class CognitiveTrainingApp(tk.Tk):
         # Create the control UI objects
         control_experiment_panel = ConfirmationAndExperimentSettings(upper_control_area)
         left_control_area = LeftControlPanel(main_frame, control_experiment_panel)
-        right_control_panel = RightControlPanel(right_frame, left_control_area)
         terminal_panel = StatusPanel(right_frame)
+
+        right_control_panel = RightControlPanel(right_frame, left_control_area, control_experiment_panel)
 
         # Place the objects in the UI
         main_frame.pack(fill="both", expand=True)

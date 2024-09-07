@@ -29,7 +29,7 @@ class AuraDataWriter:
 
         return csv.writer(file), file
 
-    def write_data(self, data, data_timestamp, data_eeg, data_egg_timestamp, b_well_data, status_label=''):
+    def write_data(self, data, data_timestamp, data_eeg, data_egg_timestamp, b_well_data, status_label=None):
         """
         Writes the data to a csv file of the current session.
         :param data: data from AURA power stream
@@ -40,8 +40,10 @@ class AuraDataWriter:
         :param status_label: signal of experiment status
         :return: None
         """
-        self.aura_writer.writerow([data_timestamp] + data + [status_label] + b_well_data)
-        self.aura_writer_eeg.writerow([data_egg_timestamp] + data_eeg + [status_label] + b_well_data)
+        if status_label is None:
+            status_label = []
+        self.aura_writer.writerow([data_timestamp] + data + status_label + b_well_data)
+        self.aura_writer_eeg.writerow([data_egg_timestamp] + data_eeg + status_label + b_well_data)
 
     def close_writer(self):
         """

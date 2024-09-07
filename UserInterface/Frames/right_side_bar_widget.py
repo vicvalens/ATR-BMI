@@ -3,13 +3,14 @@ import tkinter as tk
 class RightControlPanel(tk.Frame):
     __BUTTON_FONT_COLOR = 'black'
     __BACKGROUND_COLOR = "#033DA6"
-    def __init__(self, parent, left_panel):
+    def __init__(self, parent, left_panel, experiment_config_panel):
         super().__init__(parent, bg=self.__BACKGROUND_COLOR, width=200)
         self.release_participant_button = None
         self.set_participant_button = None
         self.participant_id_entry = None
         self.participant_id = tk.StringVar()
         self.left_panel = left_panel
+        self.experiment_config_panel = experiment_config_panel
 
         self.create_widgets()
 
@@ -58,3 +59,4 @@ class RightControlPanel(tk.Frame):
         self.set_participant_button['state'] = tk.NORMAL
         self.release_participant_button['state'] = tk.DISABLED
         self.left_panel.disable_buttons()
+        self.experiment_config_panel.clear_frame()

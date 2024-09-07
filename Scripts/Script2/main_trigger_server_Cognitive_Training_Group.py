@@ -13,7 +13,7 @@ info = StreamInfo('test_triggers', 'triggers', 1, 0, 'string', 'myuidw43536')
 outlet = StreamOutlet(info)
 
 reading_keyboard=False
-backspace_num=0
+# backspace_num=0
 
 directory = 'participants/'
 
