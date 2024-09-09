@@ -15,11 +15,11 @@ class Mole(CognitiveFunctions):
     def routine(self):
         self.gui_terminal.clear_text()
         self.gui_terminal.write_text('Starting Egg Attention session')
-        self.outlet_channel.push_sample(["start_session:mole"])
+        self.data_writer.set_state("start_session:mole")
         for i in range(self.length_of_experiment):
             if self.stop_event.is_set():
                 break
             self.gui_terminal.write_text('----> Minute: ' + str(i + 1) + ' <----')
             time.sleep(60)
-        self.outlet_channel.push_sample(["end_session:mole"])
+        self.data_writer.set_state("end_session:mole")
         self.gui_terminal.write_text('End mole_control_inhibition routine')
