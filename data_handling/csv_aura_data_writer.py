@@ -1,13 +1,19 @@
 import os
 import csv
+import threading
 from datetime import datetime
+
+from data_handling.aura_signal_handler import AuraSignalHandler
 
 
 class AuraDataWriter:
     __DEFAULT_FOLDER_PATH = "participants"
-    def __init__(self, participant_id: str):
+    def __init__(self, participant_id: str, signal_handler: AuraSignalHandler):
         self.folder_path = None
+        self.state = None
+        self.state_lock = threading.Lock()  # Add a lock for thread-safe state updates
         self.participant_id = participant_id
+        self.signal_handler = signal_handler
 
         self.folder_path = os.path.join(self.__DEFAULT_FOLDER_PATH, self.participant_id)
         os.makedirs(self.folder_path, exist_ok=True)
@@ -28,22 +34,40 @@ class AuraDataWriter:
         file = open(csv_path, "w", newline="")
 
         return csv.writer(file), file
+    
+    def set_state(self, new_state):
+        with self.state_lock:
+            self.state = new_state
 
-    def write_data(self, data, data_timestamp, data_eeg, data_egg_timestamp, b_well_data, status_label=None):
+    def get_state(self):
+        with self.state_lock:
+            return self.state
+
+    def write_data(self):
         """
         Writes the data to a csv file of the current session.
-        :param data: data from AURA power stream
-        :param data_timestamp: timestamp of the data from AURA power stream
-        :param data_eeg: data from AURA EEG stream
-        :param data_egg_timestamp: timestamp of the data from AURA EEG stream
-        :param b_well_data: Data from bWell stream if available
-        :param status_label: signal of experiment status
         :return: None
         """
-        if status_label is None:
-            status_label = []
-        self.aura_writer.writerow([data_timestamp] + data + status_label + b_well_data)
-        self.aura_writer_eeg.writerow([data_egg_timestamp] + data_eeg + status_label + b_well_data)
+        # TODO
+        #  bWell Data
+        data = self.signal_handler.get_data_from_streams()
+        aura_data = data[0]
+        aura_eeg = data[1]
+
+        if self.state is not None:
+            self.aura_writer.writerow([aura_data[1]] + aura_data[0] + [self.state])
+            self.aura_writer_eeg.writerow([aura_eeg[1]] + aura_eeg[0] + [self.state])
+            self.state = None
+        else:
+            self.aura_writer.writerow([aura_data[1]] + aura_data[0] + [])
+            self.aura_writer_eeg.writerow([aura_eeg[1]] + aura_eeg[0] + [])
+        # if status_label is None:
+        #     status_label = []
+        #
+        # if b_well_data is None:
+        #     b_well_data = []
+        # self.aura_writer.writerow([data_timestamp] + data + ['status_label'] + b_well_data)
+        # self.aura_writer_eeg.writerow([data_egg_timestamp] + data_eeg + ['status_label'] + b_well_data)
 
     def close_writer(self):
         """

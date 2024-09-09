@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+
 from UserInterface.Frames.left_side_bar_widget import LeftControlPanel
 from UserInterface.Frames.right_side_bar_widget import RightControlPanel
 from UserInterface.Frames.status_panel import StatusPanel
@@ -25,9 +26,9 @@ class CognitiveTrainingApp(tk.Tk):
         upper_control_area = tk.Frame(right_frame, bg="white")
 
         # Create the control UI objects
-        control_experiment_panel = ConfirmationAndExperimentSettings(upper_control_area)
-        left_control_area = LeftControlPanel(main_frame, control_experiment_panel)
         terminal_panel = StatusPanel(right_frame)
+        control_experiment_panel = ConfirmationAndExperimentSettings(upper_control_area, terminal_panel)
+        left_control_area = LeftControlPanel(main_frame, control_experiment_panel)
 
         right_control_panel = RightControlPanel(right_frame, left_control_area, control_experiment_panel)
 

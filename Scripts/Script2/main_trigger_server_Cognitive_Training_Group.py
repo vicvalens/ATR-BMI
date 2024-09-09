@@ -50,59 +50,59 @@ script_path = 'BMI_Control_Sender.py'
 #     return option
 
 # Send words function
-def theater_trial_routine():
-    outlet.push_sample(["start_trial"])  # start_trial
-    print("sending: start_trial")
-    #time.sleep(1)
-    outlet.push_sample(["open_curtain"])  # start_trial
-    print("sending: open_curtain")
-    time.sleep(10)
-    outlet.push_sample(["close_curtain"])  # sound_pot
-    print("sending: close_curtain")    
-    time.sleep(12)
-    outlet.push_sample(["start_performing_task"])  # sound_pot
-    print("sending: perform_task")    
-    time.sleep(20)
-    outlet.push_sample(["open_curtain"])  # sound_pot
-    print("sending: open_curtain")    
-    time.sleep(7)    
-    outlet.push_sample(["close_curtain2"])  # sound_pot
-    print("sending: close_curtain2")    
-    time.sleep(1)
-    outlet.push_sample(["end_trial"])  # end_trial
-    print("sending: end_trial")
-    #time.sleep(1)
+# def theater_trial_routine():
+#     outlet.push_sample(["start_trial"])  # start_trial
+#     print("sending: start_trial")
+#     #time.sleep(1)
+#     outlet.push_sample(["open_curtain"])  # start_trial
+#     print("sending: open_curtain")
+#     time.sleep(10)
+#     outlet.push_sample(["close_curtain"])  # sound_pot
+#     print("sending: close_curtain")
+#     time.sleep(12)
+#     outlet.push_sample(["start_performing_task"])  # sound_pot
+#     print("sending: perform_task")
+#     time.sleep(20)
+#     outlet.push_sample(["open_curtain"])  # sound_pot
+#     print("sending: open_curtain")
+#     time.sleep(7)
+#     outlet.push_sample(["close_curtain2"])  # sound_pot
+#     print("sending: close_curtain2")
+#     time.sleep(1)
+#     outlet.push_sample(["end_trial"])  # end_trial
+#     print("sending: end_trial")
+#     #time.sleep(1)
 
-def fishing_trial_routine():
-    outlet.push_sample(["start_trial"])  # start_trial
-    print("sending: start_trial")
-    time.sleep(2)
-    outlet.push_sample(["open_scene"])  # start_trial
-    print("sending: open_scene")
-    time.sleep(10)
-    outlet.push_sample(["activate_fishing"])  # sound_pot
-    print("sending: activate_fishing")    
-    time.sleep(10)
-    outlet.push_sample(["close_scene"])  # start_trial
-    print("sending: close_scene")
-    time.sleep(1) 
-    outlet.push_sample(["end_trial"])  # end_trial
-    print("sending: end_trial")
-    time.sleep(2)
+# def fishing_trial_routine():
+#     outlet.push_sample(["start_trial"])  # start_trial
+#     print("sending: start_trial")
+#     time.sleep(2)
+#     outlet.push_sample(["open_scene"])  # start_trial
+#     print("sending: open_scene")
+#     time.sleep(10)
+#     outlet.push_sample(["activate_fishing"])  # sound_pot
+#     print("sending: activate_fishing")
+#     time.sleep(10)
+#     outlet.push_sample(["close_scene"])  # start_trial
+#     print("sending: close_scene")
+#     time.sleep(1)
+#     outlet.push_sample(["end_trial"])  # end_trial
+#     print("sending: end_trial")
+#     time.sleep(2)
 
-def theather_memory():
-    trials = int(input("How many trials? "))
-    print("Press Enter to start Theater session...")
-    input()  # Wait for user input
-    outlet.push_sample(["start_session:theater"])  # start_experiment
-    print("sending: start_session:theater")    
-    for i in range(trials):
-        print("----> Trial: "+str(i+1))
-        theater_trial_routine()
-
-    outlet.push_sample(["end_session:theater"])  # start_experiment
-    print("sending: end_session:theater")
-    print("End theather_memory routine")
+# def theather_memory():
+#     trials = int(input("How many trials? "))
+#     print("Press Enter to start Theater session...")
+#     input()  # Wait for user input
+#     outlet.push_sample(["start_session:theater"])  # start_experiment
+#     print("sending: start_session:theater")
+#     for i in range(trials):
+#         print("----> Trial: "+str(i+1))
+#         theater_trial_routine()
+#
+#     outlet.push_sample(["end_session:theater"])  # start_experiment
+#     print("sending: end_session:theater")
+#     print("End theather_memory routine")
 
 def fishing_multitasking_bmi():
     global directory
@@ -114,7 +114,7 @@ def fishing_multitasking_bmi():
     print("sending: start_session:fishing")    
     for i in range(trials):
         print("----> Trial: "+str(i+1))
-        fishing_trial_routine()
+        # fishing_trial_routine()
     outlet.push_sample(["end_session:fishing"])  # start_experiment
     print("sending: end_session:fishing")
     print("End fishing Calibration routine")
@@ -139,41 +139,41 @@ def fishing_multitasking_bmi():
     print("sending: start_session:fishing_evaluation")    
     for i in range(trials):
         print("----> Trial: "+str(i+1))
-        fishing_trial_routine()
+        # fishing_trial_routine()
     outlet.push_sample(["end_session:fishing_evaluation"])  # start_experiment
     print("sending: end_session:fishing_evaluation")
     print("End fishing Calibration routine")
 
-def mole_control_inhibition():
-    mins = int(input("How many minutes? "))
-    print("Press Enter to start Mole session...")
-    input()  # Wait for user input
-    outlet.push_sample(["start_session:mole"])  # start_experiment
-    print("sending: start_session:mole")    
-    for i in range(mins):
-        print("----> Min "+str(i+1))
-        time.sleep(60)
-    outlet.push_sample(["end_session:mole"])  # start_experiment
-    print("sending: end_session:mole")
-    print("End mole_control_inhibition routine")
+# def mole_control_inhibition():
+#     mins = int(input("How many minutes? "))
+#     print("Press Enter to start Mole session...")
+#     input()  # Wait for user input
+#     outlet.push_sample(["start_session:mole"])  # start_experiment
+#     print("sending: start_session:mole")
+#     for i in range(mins):
+#         print("----> Min "+str(i+1))
+#         time.sleep(60)
+#     outlet.push_sample(["end_session:mole"])  # start_experiment
+#     print("sending: end_session:mole")
+#     print("End mole_control_inhibition routine")
 
-def egg_attention():
-    # global reading_keyboard
-    mins = int(input("How many minutes? "))
-    print("Press Enter to start Egg session...")
-    # input()  # Wait for user input
-    # reading_keyboard=True
-    # keyboard.on_press(read_keyboard)
-    outlet.push_sample(["start_session:egg"])  # start_experiment
-    print("sending: session_egg_attention")
-    for i in range(mins):
-        print("----> Min "+str(i+1))        
-        time.sleep(60)
-    outlet.push_sample(["end_session:egg"])  # start_experiment
-    print("sending: end_session:egg")
-    print("End egg_attention routine")
-    # reading_keyboard=False
-    # delete_typed_keys()
+# def egg_attention():
+#     # global reading_keyboard
+#     mins = int(input("How many minutes? "))
+#     print("Press Enter to start Egg session...")
+#     # input()  # Wait for user input
+#     # reading_keyboard=True
+#     # keyboard.on_press(read_keyboard)
+#     outlet.push_sample(["start_session:egg"])  # start_experiment
+#     print("sending: session_egg_attention")
+#     for i in range(mins):
+#         print("----> Min "+str(i+1))
+#         time.sleep(60)
+#     outlet.push_sample(["end_session:egg"])  # start_experiment
+#     print("sending: end_session:egg")
+#     print("End egg_attention routine")
+#     # reading_keyboard=False
+#     # delete_typed_keys()
 
 
 def break_rest():

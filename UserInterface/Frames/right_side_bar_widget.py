@@ -52,6 +52,8 @@ class RightControlPanel(tk.Frame):
             self.set_participant_button['state'] = tk.DISABLED
             self.release_participant_button['state'] = tk.NORMAL
             self.left_panel.enable_buttons()
+            self.experiment_config_panel.set_participant_id(self.get_participant_id())
+
 
 
     def release_participant_id(self):

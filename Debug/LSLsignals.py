@@ -1,4 +1,4 @@
-from pylsl import resolve_streams
+from pylsl import resolve_streams, pylsl, StreamOutlet, StreamInlet
 
 # Debug Code
 def detectar_senales_lsl():

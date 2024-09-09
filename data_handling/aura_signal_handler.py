@@ -22,7 +22,8 @@ class AuraSignalHandler:
                 self.inlets[self.__STREAM_NAMES[i]] = StreamInlet(self.streams[i][0])
 
         if mode != 'FISHING':
-            self.__create_b_well()
+            pass
+            # self.__create_b_well()
 
 
     def __create_b_well(self):
@@ -31,7 +32,6 @@ class AuraSignalHandler:
         :return: None
         """
         b_well_stream = pylsl.resolve_stream('name', 'bWell.Markers')
-
         if len(b_well_stream) != 0:
             self.b_well_inlet = pylsl.StreamInlet(b_well_stream[0])
 

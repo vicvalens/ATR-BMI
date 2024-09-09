@@ -1,16 +1,23 @@
 import tkinter as tk
 from tkinter import ttk
 
+from TrainingModesScripts.EggAttention import EGGAttention
+
+
 class ConfirmationAndExperimentSettings(tk.Frame):
     __BACKGROUND_COLOR = "white"
 
-    def __init__(self, parent):
+    def __init__(self, parent, terminal):
         super().__init__(parent, bg=self.__BACKGROUND_COLOR)
+        # Data fields requiered to start experiment
+        self.mode = None
+        self.__experiment_duration = tk.IntVar(value=5)
+        self.terminal = terminal
+        self.participant_id = None
+
         self.details_and_configuration_frame = None
         self.value_label = None
         self.information_label = None
-        self.mode = None
-        self.__experiment_duration = tk.IntVar(value=5)
 
     def egg_attention_menu(self):
         self.mode = 'egg_attention'
@@ -42,7 +49,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
 
 
     def fishing_multitasking_bmi_menu(self):
-        self.mode = 'fishing_multitasking_bmi'
+        self.mode = 'FISHING'
         self.clear_frame()
         self.create_side_frame()
         self.create_title('Fishing multitasking')
@@ -99,5 +106,9 @@ class ConfirmationAndExperimentSettings(tk.Frame):
 
         self.value_label.pack(side='top', pady=0)
 
+    def set_participant_id(self, participant_id):
+        self.participant_id = participant_id
+
     def start_experiment(self):
-        print(self.mode)
+        task_handler = EGGAttention(self.participant_id, self.mode, self.terminal, self.__experiment_duration.get())
+        task_handler.start_routine()
