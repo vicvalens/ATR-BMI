@@ -45,7 +45,6 @@ class RightControlPanel(tk.Frame):
         self.participant_id_entry.delete(0, 'end')
         self.participant_id.set('')
 
-
     def set_participant_id(self):
         if self.get_participant_id() != '':
             self.participant_id.set(self.participant_id_entry.get())
@@ -54,11 +53,16 @@ class RightControlPanel(tk.Frame):
             self.left_panel.enable_buttons()
             self.experiment_config_panel.set_participant_id(self.get_participant_id())
 
-
-
     def release_participant_id(self):
-        self.clear_participant_id()
-        self.set_participant_button['state'] = tk.NORMAL
+        if not self.experiment_config_panel.on_experiment:
+            self.clear_participant_id()
+            self.set_participant_button['state'] = tk.NORMAL
+            self.release_participant_button['state'] = tk.DISABLED
+            self.left_panel.disable_buttons()
+            self.experiment_config_panel.clear_frame()
+
+    def lock_buttons_in_experiment(self):
         self.release_participant_button['state'] = tk.DISABLED
-        self.left_panel.disable_buttons()
-        self.experiment_config_panel.clear_frame()
+
+    def unlock_buttons_in_experiment(self):
+        self.release_participant_button['state'] = tk.NORMAL

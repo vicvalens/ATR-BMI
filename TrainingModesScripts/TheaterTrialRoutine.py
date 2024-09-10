@@ -3,8 +3,8 @@ from TrainingModesScripts.CognitiveFunctions import CognitiveFunctions
 import time
 
 class TheaterTrialRoutine(CognitiveFunctions):
-    def __init__(self, participant_id, mode, gui_terminal, duration):
-        super().__init__(participant_id, mode)
+    def __init__(self, participant_id, mode, gui_terminal, duration, on_completion_callback):
+        super().__init__(participant_id, mode, on_completion_callback)
         self.gui_terminal = gui_terminal
         self.length_of_experiment = duration
 

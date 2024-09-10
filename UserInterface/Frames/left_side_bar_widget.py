@@ -1,5 +1,5 @@
 import tkinter as tk
-from UserInterface.UI_buttons_functions import *
+from UserInterface.ConfirmationAndExperimentSettings import *
 
 class LeftControlPanel(tk.Frame):
     BUTTON_FONT_COLOR = 'black'

@@ -2,17 +2,17 @@ from abc import ABC, abstractmethod
 from data_handling.aura_signal_handler import AuraSignalHandler
 from data_handling.csv_aura_data_writer import AuraDataWriter
 import threading
-import time
 
 class CognitiveFunctions(ABC):
-    def __init__(self, participant_id, mode):
-
+    def __init__(self, participant_id, mode, on_completion_callback):
         self.signal_handler = AuraSignalHandler(mode)
         self.data_writer = AuraDataWriter(participant_id, self.signal_handler)
 
         self.routine_thread = None
         self.data_writer_thread = None
         self.stop_event = threading.Event()
+        self.on_completion_callback = on_completion_callback
+
 
     @abstractmethod
     def routine(self):
@@ -24,10 +24,18 @@ class CognitiveFunctions(ABC):
         self.data_writer_thread = threading.Thread(target=self.data_writer_routine)
         self.routine_thread.start()
         self.data_writer_thread.start()
+        # Wait for both threads to complete
+        self.routine_thread.join()
+        self.data_writer_thread.join()
+        # Call the completion callback
+        if self.on_completion_callback:
+            self.on_completion_callback()
 
     def _routine_wrapper(self):
-        self.routine()
-        self.stop_event.set()  # Signal to stop data_writer_routine when main routine is done
+        try:
+            self.routine()
+        finally:
+            self.stop_event.set()  # Signal to stop data_writer_routine when main routine is done
 
     def stop_routine(self):
         self.stop_event.set()
@@ -35,6 +43,8 @@ class CognitiveFunctions(ABC):
             self.routine_thread.join()
         if self.data_writer_thread and self.data_writer_thread.is_alive():
             self.data_writer_thread.join()
+        if self.on_completion_callback:
+            self.on_completion_callback()
 
     def data_writer_routine(self):
         while not self.stop_event.is_set():
