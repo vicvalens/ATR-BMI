@@ -1,4 +1,5 @@
 import threading
+import time
 import tkinter as tk
 from tkinter import ttk
 
@@ -16,6 +17,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
     def __init__(self, parent, terminal):
         super().__init__(parent, bg=self.__BACKGROUND_COLOR)
         # Data fields required to start experiment
+        self.experiment_2 = None
         self.fishing_text = None
         self.fishing_label = None
         self.experiment_thread = None
@@ -166,8 +168,12 @@ class ConfirmationAndExperimentSettings(tk.Frame):
                                        self.on_experiment_completed)
             else:
                 self.experiment = FishingMultitasking(self.participant_id, self.mode, self.terminal,
-                                                      self.__experiment_duration.get(), self.__fishing_duration,
-                                                      self.on_experiment_completed())
+                                                      self.__experiment_duration.get(), self.__fishing_duration.get(),
+                                                      self.on_first_experiment_completed, 'trial')
+                time.sleep(1)
+                self.experiment_2 = FishingMultitasking(self.participant_id, self.mode, self.terminal,
+                                                      self.__experiment_duration.get(), self.__fishing_duration.get(),
+                                                      self.on_experiment_completed, 'run')
 
             self.on_experiment = True
             self.start_button.config(state=tk.DISABLED)
@@ -176,14 +182,20 @@ class ConfirmationAndExperimentSettings(tk.Frame):
 
     def run_experiment(self):
         try:
-            self.experiment.start_routine()
+            if self.mode == 'FISHING':
+                self.experiment.start_routine()
+                # The second experiment will be started in on_first_experiment_completed
+            else:
+                self.experiment.start_routine()
         finally:
-            pass
-            self.after(0, self.on_experiment_completed)  # Schedule on_experiment_completed to run on the main thread
+            if self.mode != 'FISHING':
+                self.after(0, self.on_experiment_completed)
+
 
     def on_experiment_completed(self):
         self.on_experiment = False
         self.start_button.config(state=tk.NORMAL)
+        self.terminal.write_text("All experiments completed.")
 
     def check_streams(self):
         streams = pylsl.resolve_streams()
@@ -196,5 +208,9 @@ class ConfirmationAndExperimentSettings(tk.Frame):
         for stream in streams_required:
             if stream not in names_of_available_streams:
                 return False
-
         return True
+
+    def on_first_experiment_completed(self):
+        self.terminal.write_text("First experiment (trial) completed. Starting second experiment (run).")
+        self.experiment_2.start_routine()
+        self.after(0, self.on_experiment_completed)

@@ -5,10 +5,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 
 
-def logistic_regression(terminal):
+def logistic_regression(terminal, participant_id):
 	# Load the datasets
-	multitask = pd.read_csv('../Data/multitask.csv').assign(Label=-1)
-	bmi = pd.read_csv('../Data/bmi.csv').assign(Label=1)
+	multitask = pd.read_csv('participants/' + participant_id + '/multitask.csv').assign(Label=-1)
+	bmi = pd.read_csv('participants/' + participant_id + '/bmi.csv').assign(Label=1)
 
 	# Concatenate the datasets
 	df = pd.concat([multitask, bmi])
@@ -44,6 +44,6 @@ def logistic_regression(terminal):
 	train_score = model.score(X_train, y_train)
 	test_score = model.score(X_test, y_test)
 
-	terminal.write_text("Training accuracy: ", train_score)
-	terminal.write_text("Testing accuracy: ", test_score)
+	terminal.write_text("Training accuracy: " + str(train_score))
+	terminal.write_text("Testing accuracy: " + str(test_score))
 	return model 

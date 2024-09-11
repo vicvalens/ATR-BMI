@@ -8,21 +8,25 @@ import os
 import shutil
 
 class FishingMultitasking(CognitiveFunctions):
-    def __init__(self, participant_id, mode, gui_terminal, duration, routine_length, on_completion_callback):
+    def __init__(self, participant_id, mode, gui_terminal, duration, routine_length, on_completion_callback, run_trial):
         super().__init__(participant_id, mode, on_completion_callback)
+        self.filename_training = None
         self.bmi_thread = None
         self.participant_id = participant_id
         self.gui_terminal = gui_terminal
         self.length_of_experiment = duration
         self.routine_length = routine_length
+        self.run_trial = run_trial
 
     def routine(self):
-        self.trial_routine()
-        self.experiment_routine()
+        if self.run_trial == 'trial':
+            self.trial_routine()
+        else:
+            self.experiment_routine()
 
     def trial_routine(self):
+        self.gui_terminal.clear_text()
         self.gui_terminal.write_text("**** Calibration Stage ****")
-        self.gui_terminal.write_text("Press Enter to start Fishing Calibration session...")
         self.gui_terminal.write_text("sending: start_session:fishing")
         self.data_writer.set_state("start_session:fishing")
 
@@ -32,70 +36,73 @@ class FishingMultitasking(CognitiveFunctions):
         self.data_writer.set_state("end_session:fishing")
         self.gui_terminal.write_text("sending: end_session:fishing")
         self.gui_terminal.write_text("End fishing Calibration routine")
-
+        self.stop_event.set()
         directory = os.path.join('participants/', self.participant_id)
         source_filename = self.search_and_copy(directory)
         self.gui_terminal.write_text(source_filename)
-        shutil.copyfile(source_filename, "../../Data/fishing.csv")
+        shutil.copyfile(source_filename, str('participants/' + self.participant_id + '/' + 'fishing.csv'))
+        self.filename_training =  'participants/' + self.participant_id + '/' + 'fishing.csv'
         self.gui_terminal.write_text(f'File {source_filename} has been copied as fishing.csv')
 
     def experiment_routine(self):
+        self.gui_terminal.clear_text()
         self.gui_terminal.write_text("*****Lunching BMI Control Sender ****")
         time.sleep(2)
         self.bmi_thread = threading.Thread(target=self.bmi_calibration)
         self.bmi_thread.start()
         # repeat Fishing scene
         self.gui_terminal.write_text("**** Evaluation Stage ****")
-        self.gui_terminal.write_text("Press Enter to start Fishing Evaluation session...")
         self.data_writer.set_state("start_session:fishing_evaluation")
         self.gui_terminal.write_text("sending: start_session:fishing_evaluation")
+
         for i in range(self.routine_length):
             self.gui_terminal.write_text("----> Trial: " + str(i + 1))
             self.__fishing_trial_routine()
         self.data_writer.set_state("end_session:fishing_evaluation")
-
         self.gui_terminal.write_text("sending: end_session:fishing_evaluation")
+        self.stop_event.set()
         self.gui_terminal.write_text("End fishing Calibration routine")
 
     def __fishing_trial_routine(self):
         self.data_writer.set_state("start_trial")
         self.gui_terminal.write_text("sending: start_trial")
         time.sleep(2)
-        self.data_writer.set_state("open_scene")
+        self.data_writer.set_state("['open_scene']")
         self.gui_terminal.write_text("sending: open_scene")
         time.sleep(10)
-        self.data_writer.set_state("activate_fishing")
+        self.data_writer.set_state("['activate_fishing']")
         self.gui_terminal.write_text("sending: activate_fishing")
         time.sleep(10)
         self.data_writer.set_state('close_scene')
         self.gui_terminal.write_text("sending: close_scene")
         time.sleep(1)
-        self.data_writer.set_state('end_trial')
+        self.data_writer.set_state("['close_scene']")
         self.gui_terminal.write_text("sending: end_trial")
         time.sleep(2)
 
     def search_and_copy(self, directory):
         source = ""
         for filename in os.listdir(directory):
-            if filename.endswith(".csv") and 'fishing' in filename:
+            if filename.endswith(".csv") and 'fishing' in filename and not 'egg' in filename:
                 source = os.path.join(directory, filename)
                 break
         else:
             self.gui_terminal.write_text('No CSV file containing "fishing" found in the directory')
         return source
 
-    def bmi_calibration(self, filename):
+    def bmi_calibration(self):
         self.gui_terminal.write_text("*** Creating Datasets ***")
-        self.create_datasets(filename)
-        self.gui_terminal.write_text("*** Trining Logistic Regression ***")
-        model = logistic_regression(self.gui_terminal)
+        self.create_datasets()
+        self.gui_terminal.write_text("*** Training Logistic Regression ***")
+        model = logistic_regression(self.gui_terminal, self.participant_id)
 
         return model
 
-    def create_datasets(self, filename):
+    def create_datasets(self):
+        if self.filename_training is None:
+            self.filename_training = 'participants/' + self.participant_id + '/' + 'fishing.csv'
         # Read the csv file into a pandas dataframe
-        df = pd.read_csv(filename)
-
+        df = pd.read_csv(self.filename_training)
         # Initiate the multitask and bmi datasets as empty lists
         multitask = []
         bmi = []
@@ -141,5 +148,5 @@ class FishingMultitasking(CognitiveFunctions):
         bmi = bmi.iloc[:, 1:-2]
 
         # Save the resultant dataframes to csv files
-        multitask.to_csv('multitask.csv', index=False)
-        bmi.to_csv('bmi.csv', index=False)
+        multitask.to_csv('participants/' + self.participant_id + '/multitask.csv', index=False)
+        bmi.to_csv('participants/' + self.participant_id + '/bmi.csv', index=False)

@@ -7,13 +7,12 @@ import threading
 class CognitiveFunctions(ABC):
     def __init__(self, participant_id, mode, on_completion_callback):
         self.signal_handler = AuraSignalHandler(mode)
-        self.data_writer = AuraDataWriter(participant_id, self.signal_handler)
+        self.data_writer = AuraDataWriter(participant_id, self.signal_handler, mode)
 
         self.routine_thread = None
         self.data_writer_thread = None
         self.stop_event = threading.Event()
         self.on_completion_callback = on_completion_callback
-
 
     @abstractmethod
     def routine(self):
