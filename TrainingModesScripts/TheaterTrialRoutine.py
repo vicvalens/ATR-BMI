@@ -12,15 +12,21 @@ class TheaterTrialRoutine(CognitiveFunctions):
         self.gui_terminal.clear_text()
         self.gui_terminal.write_text('Sending: start_trial')
         self.data_writer.set_state("start_session:theater")
+        time.sleep(0.1)
         for i in range(self.length_of_experiment):
             self.gui_terminal.write_text('----> Trial: ' + str(i + 1))
             self.__theater_trial_routine()
-        self.data_writer.set_state("Sending: end_session:theater")
+        self.data_writer.set_state("end_session:theater")
         self.gui_terminal.write_text('End Theater memory routine')
+
+        # Stop the data writer thread
+        self.stop_event.set()
+
 
     def __theater_trial_routine(self):
         self.data_writer.set_state("start_trial")  # start_trial
         self.gui_terminal.write_text("sending: start_trial")
+        time.sleep(0.1)
         self.data_writer.set_state("open_curtain")  # start_trial
         self.gui_terminal.write_text("sending: open_curtain")
         time.sleep(10)

@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 from data_handling.aura_signal_handler import AuraSignalHandler
 from data_handling.csv_aura_data_writer import AuraDataWriter
@@ -49,3 +50,7 @@ class CognitiveFunctions(ABC):
     def data_writer_routine(self):
         while not self.stop_event.is_set():
             self.data_writer.write_data()
+            time.sleep(0.1)  # Add a small sleep to prevent busy-waiting
+
+        # Write one last time after the stop event is set
+        self.data_writer.write_data()

@@ -5,28 +5,28 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 
 
-def Logistic_Regression():
+def logistic_regression(terminal):
 	# Load the datasets
-	multitask = pd.read_csv('../../Data/multitask.csv').assign(Label=-1)
-	bmi = pd.read_csv('../../Data/bmi.csv').assign(Label=1)
+	multitask = pd.read_csv('../Data/multitask.csv').assign(Label=-1)
+	bmi = pd.read_csv('../Data/bmi.csv').assign(Label=1)
 
 	# Concatenate the datasets
 	df = pd.concat([multitask, bmi])
 
-	print("df size: "+str(df.shape))
+	terminal.write_text("df size: "+str(df.shape))
 
 	# Separate features and target
 	X = df.iloc[:, :-1]
 	y = df.iloc[:, -1]
 
-	print("X:"+ str(X.shape))
+	terminal.write_text("X:"+ str(X.shape))
 
 	# Create a scaler object
 	scaler = MinMaxScaler(feature_range=(-1, 1))
 
 	#sc_x = scaler.fit_transform(X)
 	X = scaler.fit_transform(X)
-	print("X_train size: "+str(len(X[0])))
+	terminal.write_text("X_train size: "+str(len(X[0])))
 
 	# Convert the target into binary categories
 #	y = pd.cut(y, bins=[y.min(), y.median(), y.max()], include_lowest=True, labels=[0, 1])
@@ -44,6 +44,6 @@ def Logistic_Regression():
 	train_score = model.score(X_train, y_train)
 	test_score = model.score(X_test, y_test)
 
-	print("Training accuracy: ", train_score)
-	print("Testing accuracy: ", test_score)
+	terminal.write_text("Training accuracy: ", train_score)
+	terminal.write_text("Testing accuracy: ", test_score)
 	return model 

@@ -16,10 +16,24 @@ class Mole(CognitiveFunctions):
         self.gui_terminal.clear_text()
         self.gui_terminal.write_text('Starting Egg Attention session')
         self.data_writer.set_state("start_session:mole")
-        for i in range(self.length_of_experiment):
+
+        start_time = time.time()
+        elapsed_time = 0
+        prev_time = 0
+        while elapsed_time < self.length_of_experiment * 60:  # Convert minutes to seconds
             if self.stop_event.is_set():
                 break
-            self.gui_terminal.write_text('----> Minute: ' + str(i + 1) + ' <----')
-            time.sleep(60)
+
+            prev_minute = int(elapsed_time / 60) + 1
+            if prev_minute != prev_time:
+                self.gui_terminal.write_text(f'----> Minute: {prev_minute} <----')
+                prev_time = prev_minute
+
+            # Sleep for shorter intervals to allow more responsive stopping
+            time.sleep(1)
+            elapsed_time = time.time() - start_time
+
         self.data_writer.set_state("end_session:mole")
         self.gui_terminal.write_text('End mole_control_inhibition routine')
+
+        self.stop_event.set()
