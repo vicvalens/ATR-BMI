@@ -4,7 +4,7 @@ from tkinter import ttk
 from UserInterface.Frames.left_side_bar_widget import LeftControlPanel
 from UserInterface.Frames.right_side_bar_widget import RightControlPanel
 from UserInterface.Frames.status_panel import StatusPanel
-from UserInterface.ConfirmationAndExperimentSettings import ConfirmationAndExperimentSettings
+from UserInterface.Frames.ConfirmationAndExperimentSettings import ConfirmationAndExperimentSettings
 
 
 class CognitiveTrainingApp(tk.Tk):

@@ -1,6 +1,8 @@
 import threading
 
 import pandas as pd
+from pylsl import pylsl, StreamOutlet, StreamInfo
+
 from Models.Logistic_Regression import logistic_regression
 from TrainingModesScripts.CognitiveFunctions import CognitiveFunctions
 import time
@@ -10,6 +12,13 @@ import shutil
 class FishingMultitasking(CognitiveFunctions):
     def __init__(self, participant_id, mode, gui_terminal, duration, routine_length, on_completion_callback, run_trial):
         super().__init__(participant_id, mode, on_completion_callback)
+        # Create a new StreamInfo
+        info = StreamInfo(name='test_triggers', type='Markers', channel_count=1, channel_format='string',
+                          source_id='test_triggers_id')
+
+        # Create a new outlet
+        self.outlet = StreamOutlet(info)
+
         self.filename_training = None
         self.bmi_thread = None
         self.participant_id = participant_id
@@ -19,10 +28,7 @@ class FishingMultitasking(CognitiveFunctions):
         self.run_trial = run_trial
 
     def routine(self):
-        if self.run_trial == 'trial':
-            self.trial_routine()
-        else:
-            self.experiment_routine()
+        self.trial_routine()
 
     def trial_routine(self):
         self.gui_terminal.clear_text()
@@ -37,6 +43,7 @@ class FishingMultitasking(CognitiveFunctions):
         self.gui_terminal.write_text("sending: end_session:fishing")
         self.gui_terminal.write_text("End fishing Calibration routine")
         self.stop_event.set()
+
         directory = os.path.join('participants/', self.participant_id)
         source_filename = self.search_and_copy(directory)
         self.gui_terminal.write_text(source_filename)
@@ -64,21 +71,90 @@ class FishingMultitasking(CognitiveFunctions):
         self.gui_terminal.write_text("End fishing Calibration routine")
 
     def __fishing_trial_routine(self):
+        # Resolviendo el stream de 'testtriggers2' para recibir triggers
+        self.gui_terminal.write_text("Resolviendo stream de 'testtriggers2' para recibir triggers...")
+        streams = pylsl.resolve_stream('name', 'testtriggers2')
+        if not streams:
+            self.gui_terminal.write_text("No se encontró el stream 'testtriggers2'.")
+            return
+
+        inlet = pylsl.StreamInlet(streams[0])
+
+        # Enviar trigger inicial de start_trial
         self.data_writer.set_state("start_trial")
         self.gui_terminal.write_text("sending: start_trial")
-        time.sleep(2)
-        self.data_writer.set_state("['open_scene']")
+        time.sleep(5)
+
+        self.data_writer.set_state("open_scene")
         self.gui_terminal.write_text("sending: open_scene")
-        time.sleep(10)
-        self.data_writer.set_state("['activate_fishing']")
-        self.gui_terminal.write_text("sending: activate_fishing")
-        time.sleep(10)
-        self.data_writer.set_state('close_scene')
+        time.sleep(15)
+
+        # Función para verificar si el trigger recibido coincide con el esperado
+        def check_trigger(expected_trigger):
+            timeout = 15  # Tiempo máximo para esperar el trigger esperado (15 segundos)
+            start_time = time.time()
+
+            while time.time() - start_time < timeout:
+                trigger, _ = inlet.pull_sample(timeout=0.5)
+                if trigger:
+                    self.gui_terminal.write_text(f"Trigger recibido: {trigger[0]}")
+                    if trigger[0] == expected_trigger:
+                        return True  # Trigger coincide con el esperado
+            return False  # No se recibió el trigger esperado a tiempo
+
+        # Extensión del brazo derecho (RA)
+        if check_trigger("3"):
+            self.gui_terminal.write_text("Trigger coincide: lower_right_arm")
+            self.outlet.push_sample(["3"])
+            self.data_writer.set_state("3")
+        else:
+            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_right_arm forzado")
+            self.outlet.push_sample(["3"])
+            self.data_writer.set_state("3")  # Enviar el trigger de todas formas
+        time.sleep(15)
+
+        # Flexión del brazo derecho (RA)
+        if check_trigger("2"):
+            self.gui_terminal.write_text("Trigger coincide: rise_right_arm")
+            self.outlet.push_sample(["2"])
+            self.data_writer.set_state("2")
+        else:
+            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_right_arm forzado")
+            self.data_writer.set_state("2")  # Enviar el trigger de todas formas
+            self.outlet.push_sample(["2"])
+        time.sleep(15)
+
+        # Extensión del brazo izquierdo (LA)
+        if check_trigger("1"):
+            self.gui_terminal.write_text("Trigger coincide: lower_left_arm")
+            self.data_writer.set_state("1")
+            self.outlet.push_sample(["1"])
+        else:
+            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_left_arm forzado")
+            self.data_writer.set_state("1")  # Enviar el trigger de todas formas
+            self.outlet.push_sample(["1"])
+        time.sleep(15)
+
+        # Flexión del brazo izquierdo (LA)
+        if check_trigger("0"):
+            self.gui_terminal.write_text("Trigger coincide: rise_left_arm")
+            self.data_writer.set_state("0")
+            self.outlet.push_sample(["0"])
+        else:
+            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_left_arm forzado")
+            self.data_writer.set_state("0")  # Enviar el trigger de todas formas
+            self.outlet.push_sample(["0"])
+        time.sleep(15)
+
+        # Cerrar escena
+        self.data_writer.set_state("close_scene")
         self.gui_terminal.write_text("sending: close_scene")
         time.sleep(1)
-        self.data_writer.set_state("['close_scene']")
+
+        # Terminar prueba
+        self.data_writer.set_state("end_trial")
         self.gui_terminal.write_text("sending: end_trial")
-        time.sleep(2)
+        time.sleep(5)
 
     def search_and_copy(self, directory):
         source = ""
