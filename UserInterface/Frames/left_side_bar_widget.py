@@ -26,7 +26,7 @@ class LeftControlPanel(tk.Frame):
         # Experiment mode buttons
         for text, command in self.MODES:
             btn = tk.Button(self, text=text, command=command,
-                            bg="#34495e",
+                            bg="white",
                             fg=self.BUTTON_FONT_COLOR,
                             activebackground="#2c3e50",
                             activeforeground="#ecf0f1",

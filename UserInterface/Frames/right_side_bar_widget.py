@@ -27,13 +27,13 @@ class RightControlPanel(tk.Frame):
         information_label = tk.Label(self, text="Ingresa el ID del participante: ", bg=self.__BACKGROUND_COLOR, fg='white')
         information_label.pack(side="bottom", fill="x")
 
-        self.set_participant_button = tk.Button(button_frame, text="Set", bg=self.__BACKGROUND_COLOR, fg=self.__BUTTON_FONT_COLOR,
+        self.set_participant_button = tk.Button(button_frame, text="Set", bg='white', fg=self.__BUTTON_FONT_COLOR,
                          activebackground="#2c3e50", activeforeground="#ecf0f1",
                          bd=0, pady=10, font=("Arial", 12), command=self.set_participant_id)
         self.set_participant_button.pack(side="left", expand=True, padx=5)
 
         self.release_participant_button = tk.Button(button_frame,
-                        text="Release", bg=self.__BACKGROUND_COLOR, fg=self.__BUTTON_FONT_COLOR,
+                        text="Release", bg='white', fg=self.__BUTTON_FONT_COLOR,
                          activebackground="#2c3e50", activeforeground="#ecf0f1",
                          bd=0, pady=10, font=("Arial", 12), state=tk.DISABLED, command=self.release_participant_id)
         self.release_participant_button.pack(side="left", expand=True, padx=5)

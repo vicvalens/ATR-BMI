@@ -1,5 +1,4 @@
 import threading
-import time
 import tkinter as tk
 from tkinter import ttk
 
@@ -72,27 +71,9 @@ class ConfirmationAndExperimentSettings(tk.Frame):
             self.clear_frame()
             self.create_side_frame()
             self.create_title('Fishing multitasking')
-            self.information_label = 'Numero de entrenamientos: '
-            self.fishing_text = 'Numero de pruebas: '
+            self.information_label = 'Número de entrenamientos: '
+            self.fishing_text = 'Número de Trials: '
             self.create_slider()
-            slider = ttk.Scale(
-                self.details_and_configuration_frame,
-                from_=1,
-                to=30,
-                orient=tk.HORIZONTAL,
-                variable=self.__fishing_duration,
-                command=self.__update_fishing_slider,
-                length=200,
-            )
-            slider.pack(side=tk.TOP, padx=(10, 5), pady=5)
-
-            self.fishing_label = tk.Label(
-                self.details_and_configuration_frame,
-                text=self.fishing_text + str(self.__fishing_duration.get()),
-                bg='#D3D3D3'
-            )
-
-            self.fishing_label.pack(side='top', pady=0)
             self.create_start_button()
 
 
@@ -133,7 +114,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
         slider = ttk.Scale(
             self.details_and_configuration_frame,
             from_=1,
-            to=60,
+            to=10,
             orient=tk.HORIZONTAL,
             variable=self.__experiment_duration,
             command=self.__update_slider_value,
