@@ -26,6 +26,12 @@ class AuraDataWriter:
         self.end_session_flag = False
 
     def create_writer(self, session_name, suffix=""):
+        """
+        Creates a CSV Writer object for the aura signals.
+        :param session_name: The name of the participant taking the experiment
+        :param suffix: The suffix of the csv file considering if is the RAW of filtered data
+        :return: The writer object and the file
+        """
         now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         filename = f"{self.mode}_{session_name}_{suffix}_{now}.csv" if suffix else f"{self.mode}_{session_name}_{now}.csv"
         csv_path = os.path.join(self.folder_path, filename)
@@ -33,6 +39,11 @@ class AuraDataWriter:
         return csv.writer(file), file
 
     def set_state(self, new_state):
+        """
+        Set the state of the writer so if there's a trigger it is handle by an internal change of state
+        :param new_state: A string containing the new state
+        :return: None
+        """
         with self.state_lock:
             if not self.end_session_flag:
                 self.state = new_state
@@ -40,10 +51,19 @@ class AuraDataWriter:
                     self.end_session_flag = True
 
     def get_state(self):
+        """
+        This implemented so the writing of the data is thread safe.
+        :return: the state of the lock
+        """
         with self.state_lock:
             return self.state
 
     def write_data(self):
+        """
+        Writes the data from the aura streams to the CSV file, if the mode is appropriate also gets the data from the
+        bWell stram
+        :return: None
+        """
         data = self.signal_handler.get_data_from_streams()
         aura_data = data[0]
         aura_eeg = data[1]
@@ -52,9 +72,15 @@ class AuraDataWriter:
 
         # Only write the state if it's not None or if it's an end_session state
         state_to_write = current_state if current_state is not None or self.end_session_flag else ""
-
-        self.aura_writer.writerow([aura_data[1]] + aura_data[0] + [state_to_write])
-        self.aura_writer_eeg.writerow([aura_eeg[1]] + aura_eeg[0] + [state_to_write])
+        b_well_data = ''
+        if len(data) == 3:
+            b_well_data = data[2]
+        if self.mode == 'fishing':
+            self.aura_writer.writerow([aura_data[1]] + aura_data[0] + [state_to_write])
+            self.aura_writer_eeg.writerow([aura_eeg[1]] + aura_eeg[0] + [state_to_write])
+        else:
+            self.aura_writer.writerow([aura_data[1]] + aura_data[0] + [state_to_write] + [b_well_data])
+            self.aura_writer_eeg.writerow([aura_eeg[1]] + aura_eeg[0] + [state_to_write] + [b_well_data])
 
         # Reset the state to None after writing, unless it's an end_session state
         if not self.end_session_flag:
@@ -68,5 +94,9 @@ class AuraDataWriter:
         self.aura_eeg_file.flush()
 
     def close_writer(self):
+        """
+        Closes the csv writer object.
+        :return: None
+        """
         self.aura_file.close()
         self.aura_eeg_file.close()

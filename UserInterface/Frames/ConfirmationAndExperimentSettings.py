@@ -168,6 +168,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
         self.on_experiment = False
         self.start_button.config(state=tk.NORMAL)
         self.terminal.write_text("All experiments completed.")
+        self.experiment.finish_routine()
 
     def check_streams(self):
         streams = pylsl.resolve_streams()

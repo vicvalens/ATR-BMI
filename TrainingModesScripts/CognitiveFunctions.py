@@ -53,3 +53,6 @@ class CognitiveFunctions(ABC):
 
         # Write one last time after the stop event is set
         self.data_writer.write_data()
+
+    def finish_routine(self):
+        self.data_writer.close_writer()
