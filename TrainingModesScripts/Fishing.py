@@ -109,8 +109,8 @@ class FishingMultitasking(CognitiveFunctions):
             self.data_writer.set_state("3")
         else:
             self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_right_arm forzado")
+            self.data_writer.set_state("3 lower_right_arm_forced")  # Enviar el trigger de todas formas
             self.outlet.push_sample(["3"])
-            self.data_writer.set_state("3")  # Enviar el trigger de todas formas
         time.sleep(15)
 
         # Flexión del brazo derecho (RA)
@@ -120,7 +120,7 @@ class FishingMultitasking(CognitiveFunctions):
             self.data_writer.set_state("2")
         else:
             self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_right_arm forzado")
-            self.data_writer.set_state("2")  # Enviar el trigger de todas formas
+            self.data_writer.set_state("2 rise_right_arm_forced")  # Enviar el trigger de todas formas
             self.outlet.push_sample(["2"])
         time.sleep(15)
 
@@ -131,7 +131,7 @@ class FishingMultitasking(CognitiveFunctions):
             self.outlet.push_sample(["1"])
         else:
             self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_left_arm forzado")
-            self.data_writer.set_state("1")  # Enviar el trigger de todas formas
+            self.data_writer.set_state("1 lower_left_arm_forced")  # Enviar el trigger de todas formas
             self.outlet.push_sample(["1"])
         time.sleep(15)
 
@@ -142,7 +142,7 @@ class FishingMultitasking(CognitiveFunctions):
             self.outlet.push_sample(["0"])
         else:
             self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_left_arm forzado")
-            self.data_writer.set_state("0")  # Enviar el trigger de todas formas
+            self.data_writer.set_state("0 rise_left_arm_forced")  # Enviar el trigger de todas formas
             self.outlet.push_sample(["0"])
         time.sleep(15)
 
