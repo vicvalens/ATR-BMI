@@ -14,7 +14,7 @@ class CognitiveTrainingApp(tk.Tk):
         self.title("ATR-BMI")
         self.geometry("1250x650")
         self.configure(bg="#f0f0f0")  # Light gray background
-        self.minsize(1250, 650)
+        self.minsize(750, 550)
 
         self.create_main_widget()
 
