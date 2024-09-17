@@ -79,8 +79,8 @@ class AuraDataWriter:
             self.aura_writer.writerow([aura_data[1]] + aura_data[0] + [state_to_write])
             self.aura_writer_eeg.writerow([aura_eeg[1]] + aura_eeg[0] + [state_to_write])
         else:
-            self.aura_writer.writerow([aura_data[1]] + aura_data[0] + [state_to_write] + [b_well_data])
-            self.aura_writer_eeg.writerow([aura_eeg[1]] + aura_eeg[0] + [state_to_write] + [b_well_data])
+            self.aura_writer.writerow([aura_data[1]] + aura_data[0] + [state_to_write] + [b_well_data[0][0]])
+            self.aura_writer_eeg.writerow([aura_eeg[1]] + aura_eeg[0] + [state_to_write] + [b_well_data[0][0]])
 
         # Reset the state to None after writing, unless it's an end_session state
         if not self.end_session_flag:
