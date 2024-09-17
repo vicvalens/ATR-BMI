@@ -83,10 +83,12 @@ class FishingMultitasking(CognitiveFunctions):
         # Enviar trigger inicial de start_trial
         self.data_writer.set_state("start_trial")
         self.gui_terminal.write_text("sending: start_trial")
+        self.outlet.push_sample(["start_trial"])
         time.sleep(5)
 
         self.data_writer.set_state("open_scene")
         self.gui_terminal.write_text("sending: open_scene")
+        self.outlet.push_sample(["open_scene"])
         time.sleep(15)
 
         # Función para verificar si el trigger recibido coincide con el esperado
@@ -149,11 +151,13 @@ class FishingMultitasking(CognitiveFunctions):
         # Cerrar escena
         self.data_writer.set_state("close_scene")
         self.gui_terminal.write_text("sending: close_scene")
+        self.outlet.push_sample(["close_scene"])
         time.sleep(1)
 
         # Terminar prueba
         self.data_writer.set_state("end_trial")
         self.gui_terminal.write_text("sending: end_trial")
+        self.outlet.push_sample(["end_trial"])
         time.sleep(5)
 
     def search_and_copy(self, directory):

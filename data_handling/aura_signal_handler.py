@@ -68,7 +68,7 @@ class AuraSignalHandler:
             all_data.append((inlet_data, timestamp))
 
         if self.b_well_inlet is not None:
-            all_data.append((self.b_well_inlet.pull_sample(), 0))
+            all_data.append((self.b_well_inlet.pull_sample(timeout=0.1), 0))
         return all_data
 
     def close_streams(self):

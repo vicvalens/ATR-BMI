@@ -1,11 +1,12 @@
 import subprocess
 import signal
 import sys
+import os
 from UserInterface.ui_main_file import CognitiveTrainingApp
 
 def run_eeg_classifier():
     # Start the EEG classifier subprocess
-    eeg_process = subprocess.Popen([sys.executable, 'winry.py'])
+    eeg_process = subprocess.Popen([sys.executable, 'winry.py'], stdout=open(os.devnull, 'wb'))
     return eeg_process
 
 def kill_subprocess(process):

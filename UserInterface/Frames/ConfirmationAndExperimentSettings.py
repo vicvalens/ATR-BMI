@@ -175,8 +175,10 @@ class ConfirmationAndExperimentSettings(tk.Frame):
         names_of_available_streams = [stream.name() for stream in streams]
 
         streams_required = ['AURA_Power', 'AURA_Filtered']
-        if self.mode != 'FISHING':
-            streams_required.append('bWell.markers')
+        if self.mode != 'FISHING' and len(streams_required) == 2:
+            streams_required.append('bWell.Markers')
+        elif self.mode == 'FISHING' and len(streams_required) == 3:
+            streams_required.pop()
 
         for stream in streams_required:
             if stream not in names_of_available_streams:
