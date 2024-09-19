@@ -89,6 +89,11 @@ class FishingMultitasking(CognitiveFunctions):
         self.data_writer.set_state("open_scene")
         self.gui_terminal.write_text("sending: open_scene")
         self.outlet.push_sample(["open_scene"])
+        time.sleep(10)
+
+        self.data_writer.set_state("intro")
+        self.gui_terminal.write_text("sending: intro")
+        self.outlet.push_sample(["intro"])
         time.sleep(15)
 
         # Función para verificar si el trigger recibido coincide con el esperado
@@ -108,10 +113,10 @@ class FishingMultitasking(CognitiveFunctions):
         if check_trigger("3"):
             self.gui_terminal.write_text("Trigger coincide: lower_right_arm")
             self.outlet.push_sample(["3"])
-            self.data_writer.set_state("3")
+            self.data_writer.set_state("lower_right_arm")
         else:
             self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_right_arm forzado")
-            self.data_writer.set_state("3 lower_right_arm_forced")  # Enviar el trigger de todas formas
+            self.data_writer.set_state("lower_right_arm_forced")  # Enviar el trigger de todas formas
             self.outlet.push_sample(["3"])
         time.sleep(15)
 
@@ -119,32 +124,32 @@ class FishingMultitasking(CognitiveFunctions):
         if check_trigger("2"):
             self.gui_terminal.write_text("Trigger coincide: rise_right_arm")
             self.outlet.push_sample(["2"])
-            self.data_writer.set_state("2")
+            self.data_writer.set_state("rise_right_arm")
         else:
             self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_right_arm forzado")
-            self.data_writer.set_state("2 rise_right_arm_forced")  # Enviar el trigger de todas formas
+            self.data_writer.set_state("rise_right_arm_forced")  # Enviar el trigger de todas formas
             self.outlet.push_sample(["2"])
         time.sleep(15)
 
         # Extensión del brazo izquierdo (LA)
         if check_trigger("1"):
             self.gui_terminal.write_text("Trigger coincide: lower_left_arm")
-            self.data_writer.set_state("1")
+            self.data_writer.set_state("lower_left_arm")
             self.outlet.push_sample(["1"])
         else:
             self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_left_arm forzado")
-            self.data_writer.set_state("1 lower_left_arm_forced")  # Enviar el trigger de todas formas
+            self.data_writer.set_state("lower_left_arm_forced")  # Enviar el trigger de todas formas
             self.outlet.push_sample(["1"])
         time.sleep(15)
 
         # Flexión del brazo izquierdo (LA)
         if check_trigger("0"):
             self.gui_terminal.write_text("Trigger coincide: rise_left_arm")
-            self.data_writer.set_state("0")
+            self.data_writer.set_state("rise_left_arm")
             self.outlet.push_sample(["0"])
         else:
             self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_left_arm forzado")
-            self.data_writer.set_state("0 rise_left_arm_forced")  # Enviar el trigger de todas formas
+            self.data_writer.set_state("rise_left_arm_forced")  # Enviar el trigger de todas formas
             self.outlet.push_sample(["0"])
         time.sleep(15)
 
