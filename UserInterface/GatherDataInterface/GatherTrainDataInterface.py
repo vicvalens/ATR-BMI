@@ -1,5 +1,7 @@
 import tkinter as tk
 import csv
+from tkinter import Toplevel
+
 import pylsl
 from pylsl import StreamInlet
 import time
@@ -7,16 +9,16 @@ from datetime import datetime
 import os
 import threading
 
-class CountdownApp:
-    def __init__(self, root, participant_id):
-        self.root = root
-        self.root.title("EEG Data Acquisition Protocol - Motor Imagery")
-        self.root.attributes("-fullscreen", True)
-
-        self.center_window(root)
+class CountdownApp(Toplevel):
+    def __init__(self, participant_id):
+        super().__init__()
+        self.title("EEG Data Acquisition Protocol - Motor Imagery")
+        # self.attributes("-fullscreen", True) # Does not work in macOS maybe in windows there's no problem
+        self.geometry("1920x1080")
+        self.center_window(self)
 
         self.cycle_count = 1
-        self.max_cycles = 10
+        self.max_cycles = 1
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(os.path.dirname(current_dir))
@@ -31,20 +33,20 @@ class CountdownApp:
         lsl_headers = [f'{band} {i}' for band in ['Delta', 'Theta', 'Alpha', 'Beta', 'Gamma'] for i in range(1, 9)]
         self.csv_writer.writerow(['Timestamp', 'Cycle', 'Countdown Type'] + lsl_headers)
 
-        self.cycle_label = tk.Label(root, text=f"Cycle: {self.cycle_count}/{self.max_cycles}", font=("Century Gothic", 14))
+        self.cycle_label = tk.Label(self, text=f"Cycle: {self.cycle_count}/{self.max_cycles}", font=("Century Gothic", 14))
         self.cycle_label.pack(anchor='ne', padx=5, pady=5)
 
-        self.japanese_cycle_label = tk.Label(root, text=f"循環: {self.cycle_count}/{self.max_cycles}", font=("Century Gothic", 14))
+        self.japanese_cycle_label = tk.Label(self, text=f"循環: {self.cycle_count}/{self.max_cycles}", font=("Century Gothic", 14))
         self.japanese_cycle_label.pack(anchor='ne', padx=5, pady=5)
 
 
-        self.legend_label = tk.Label(root, text="Relax your muscles, try to think about your tongue", font=("Century Gothic", 44))
+        self.legend_label = tk.Label(self, text="Relax your muscles, try to think about your tongue", font=("Century Gothic", 44))
         self.legend_label.pack(pady=5)
 
-        self.japanese_legend_label = tk.Label(root, text="力を抜いて、舌を考えてみてください", font=("Century Gothic", 44))
+        self.japanese_legend_label = tk.Label(self, text="力を抜いて、舌を考えてみてください", font=("Century Gothic", 44))
         self.japanese_legend_label.pack(pady=50)
 
-        self.label = tk.Label(root, text="5", font=("Century Gothic", 150))
+        self.label = tk.Label(self, text="5", font=("Century Gothic", 150))
         self.label.pack(pady=20)
 
         self.current_countdown_type = None
@@ -114,9 +116,9 @@ class CountdownApp:
     def countdown(self, count, next_function):
         self.label.config(text=str(count))
         if count > 0:
-            self.root.after(1000, self.countdown, count - 1, next_function)
+            self.after(1000, self.countdown, count - 1, next_function)
         else:
-            self.root.after(100, next_function)  # Short delay before starting next phase
+            self.after(100, next_function)  # Short delay before starting next phase
 
 
     def finish_protocol(self):
@@ -125,12 +127,12 @@ class CountdownApp:
         self.label.config(text="")
         self.csv_file.close()
         self.running = False
-        self.exit_fullscreen()
+        self.exit()
 
-    def exit_fullscreen(self):
-        self.root.after(1000, self.root.quit())
+    def exit(self):
+        self.destroy()
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = CountdownApp(root, '2')
-    root.mainloop()
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = CountdownApp(root, '2')
+#     root.mainloop()
