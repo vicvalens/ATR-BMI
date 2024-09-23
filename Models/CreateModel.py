@@ -15,6 +15,7 @@ class ModelCreator:
         self.best_model = None
         self.participant_id = participant_id
         self.terminal = terminal
+        df = pd.read_csv(df)
         df['Countdown Type'] = df['Countdown Type'].replace({
             'Rest': 0,
             'Left Arm Flex': 1,
@@ -102,8 +103,8 @@ class ModelCreator:
                 best_accuracy = mean_accuracy
                 best_params = (batch_size, epochs, optimizer, init_mode, activation, neurons)
 
-        print(f'Best Accuracy: {best_accuracy:.4f}')
-        print(
+        self.terminal.write_text(f'Best Accuracy: {best_accuracy:.4f}')
+        self.terminal.write_text(
             f'Best Hyperparameters: batch_size={best_params[0]}, epochs={best_params[1]}, optimizer={best_params[2]}, init_mode={best_params[3]}, activation={best_params[4]}, neurons={best_params[5]}')
         batch_size, epochs, optimizer, init_mode, activation, neurons = best_params
         self.best_model = self.create_model(optimizer=optimizer, init_mode=init_mode, activation=activation, neurons=neurons)
@@ -112,7 +113,7 @@ class ModelCreator:
     def evaluate_best_model(self):
         # Evaluate the best model on the test set
         loss, accuracy = self.best_model.evaluate(self.X_test_scaled, self.y_test)
-        print(f'Test Accuracy: {accuracy * 100:.2f}%')
+        self.terminal.write_text(f'Test Accuracy: {accuracy * 100:.2f}%')
 
     def get_best_model(self):
         return self.best_model
@@ -133,8 +134,8 @@ class ModelCreator:
         plt.title('Confusion Matrix')
         plt.show()
 
-        # Print classification report
-        print(classification_report(self.y_test, y_pred))
+        # self.terminal.write_text classification report
+        self.terminal.write_text(classification_report(self.y_test, y_pred))
 
     def save_model(self):
         self.best_model.save(f'participants/{self.participant_id}/best_model.h5', save_format='h5')
