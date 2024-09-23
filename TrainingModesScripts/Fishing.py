@@ -3,11 +3,16 @@ import threading
 import pandas as pd
 from pylsl import pylsl, StreamOutlet, StreamInfo
 
+from Models.CreateModel import ModelCreator
 from Models.Logistic_Regression import logistic_regression
+import tkinter as tk
 from TrainingModesScripts.CognitiveFunctions import CognitiveFunctions
 import time
 import os
 import shutil
+
+from UserInterface.GatherDataInterface.GatherTrainDataInterface import CountdownApp
+
 
 class FishingMultitasking(CognitiveFunctions):
     def __init__(self, participant_id, mode, gui_terminal, duration, routine_length, on_completion_callback, run_trial):
@@ -28,11 +33,23 @@ class FishingMultitasking(CognitiveFunctions):
         self.run_trial = run_trial
 
     def routine(self):
-        self.trial_routine()
+        self.gui_terminal.write_text("**** Launching Calibration process ****")
+        countdown = CountdownApp(self.participant_id)
+        self.gui_terminal.write_text("Gathering training data...")
+        while countdown.running:
+            pass
+        else:
+            self.gui_terminal.write_text("**** Calibration process terminated ****")
+            self.gui_terminal.write_text("Creating model for patient")
+            model = ModelCreator(f"participants/{self.participant_id}/training.csv", self.participant_id, self.gui_terminal)
+            model.search_and_create_best_model()
+            model.save_model()
+            self.trial_routine()
+
 
     def trial_routine(self):
         self.gui_terminal.clear_text()
-        self.gui_terminal.write_text("**** Calibration Stage ****")
+        self.gui_terminal.write_text("**** Routine session ****")
         self.gui_terminal.write_text("sending: start_session:fishing")
         self.data_writer.set_state("start_session:fishing")
 
@@ -50,25 +67,6 @@ class FishingMultitasking(CognitiveFunctions):
         shutil.copyfile(source_filename, str('participants/' + self.participant_id + '/' + 'fishing.csv'))
         self.filename_training =  'participants/' + self.participant_id + '/' + 'fishing.csv'
         self.gui_terminal.write_text(f'File {source_filename} has been copied as fishing.csv')
-
-    def experiment_routine(self):
-        self.gui_terminal.clear_text()
-        self.gui_terminal.write_text("*****Lunching BMI Control Sender ****")
-        time.sleep(2)
-        self.bmi_thread = threading.Thread(target=self.bmi_calibration)
-        self.bmi_thread.start()
-        # repeat Fishing scene
-        self.gui_terminal.write_text("**** Evaluation Stage ****")
-        self.data_writer.set_state("start_session:fishing_evaluation")
-        self.gui_terminal.write_text("sending: start_session:fishing_evaluation")
-
-        for i in range(self.routine_length):
-            self.gui_terminal.write_text("----> Trial: " + str(i + 1))
-            self.__fishing_trial_routine()
-        self.data_writer.set_state("end_session:fishing_evaluation")
-        self.gui_terminal.write_text("sending: end_session:fishing_evaluation")
-        self.stop_event.set()
-        self.gui_terminal.write_text("End fishing Calibration routine")
 
     def __fishing_trial_routine(self):
         # Resolviendo el stream de 'testtriggers2' para recibir triggers
@@ -174,64 +172,3 @@ class FishingMultitasking(CognitiveFunctions):
         else:
             self.gui_terminal.write_text('No CSV file containing "fishing" found in the directory')
         return source
-
-    def bmi_calibration(self):
-        self.gui_terminal.write_text("*** Creating Datasets ***")
-        self.create_datasets()
-        self.gui_terminal.write_text("*** Training Logistic Regression ***")
-        model = logistic_regression(self.gui_terminal, self.participant_id)
-
-        return model
-
-    def create_datasets(self):
-        if self.filename_training is None:
-            self.filename_training = 'participants/' + self.participant_id + '/' + 'fishing.csv'
-        # Read the csv file into a pandas dataframe
-        df = pd.read_csv(self.filename_training)
-        # Initiate the multitask and bmi datasets as empty lists
-        multitask = []
-        bmi = []
-
-        # Initialize flags for data capture
-        capture_multitask = False
-        capture_bmi = False
-
-        trial = 0
-        bmi_entries = 0
-        multitask_entries = 0
-
-        # Loop through each row in the dataframe
-        for index, row in df.iterrows():
-            # Check the 42nd column for keywords and set capture flags accordingly
-            if row[41] == "['open_scene']":
-                trial += 1
-                self.gui_terminal.write_text("Collecting Trial " + str(trial))
-                capture_multitask = True
-            elif row[41] == "['activate_fishing']":
-                multitask_entries = 0
-                capture_multitask = False
-                capture_bmi = True
-                continue  # skip adding this row to any dataset
-            elif row[41] == "['close_scene']":
-                bmi_entries = 0
-                capture_bmi = False
-
-            # Add the row to corresponding dataset based on capture flags
-            if capture_multitask:
-                multitask.append(row)
-                multitask_entries = multitask_entries + 1
-            elif capture_bmi:
-                bmi.append(row)
-                bmi_entries = bmi_entries + 1
-
-        # Convert the lists to dataframes using pandas.concat
-        multitask = pd.concat(multitask, axis=1).transpose()
-        bmi = pd.concat(bmi, axis=1).transpose()
-
-        # Remove the 1st and last columns from each dataframe
-        multitask = multitask.iloc[:, 1:-2]
-        bmi = bmi.iloc[:, 1:-2]
-
-        # Save the resultant dataframes to csv files
-        multitask.to_csv('participants/' + self.participant_id + '/multitask.csv', index=False)
-        bmi.to_csv('participants/' + self.participant_id + '/bmi.csv', index=False)
