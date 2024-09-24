@@ -162,12 +162,11 @@ class ConfirmationAndExperimentSettings(tk.Frame):
             self.experiment.start_routine()
         finally:
             self.after(0, self.on_experiment_completed)
-
+            self.terminal.write_text("Experiment Completed.")
 
     def on_experiment_completed(self):
         self.on_experiment = False
         self.start_button.config(state=tk.NORMAL)
-        self.terminal.write_text("All experiments completed.")
         self.experiment.finish_routine()
 
     def check_streams(self):
@@ -184,8 +183,3 @@ class ConfirmationAndExperimentSettings(tk.Frame):
             if stream not in names_of_available_streams:
                 return False
         return True
-
-    def on_first_experiment_completed(self):
-        self.terminal.write_text("First experiment (trial) completed. Starting second experiment (run).")
-        self.experiment_2.start_routine()
-        self.after(0, self.on_experiment_completed)
