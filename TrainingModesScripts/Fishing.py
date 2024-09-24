@@ -1,16 +1,13 @@
-import threading
-
-import pandas as pd
 from pylsl import pylsl, StreamOutlet, StreamInfo
 
 from Models.CreateModel import ModelCreator
-from Models.Logistic_Regression import logistic_regression
-import tkinter as tk
+
 from TrainingModesScripts.CognitiveFunctions import CognitiveFunctions
 import time
 import os
 import shutil
 
+from TrainingModesScripts.winry import Winry
 from UserInterface.GatherDataInterface.GatherTrainDataInterface import CountdownApp
 
 
@@ -18,6 +15,7 @@ class FishingMultitasking(CognitiveFunctions):
     def __init__(self, participant_id, mode, gui_terminal, duration, routine_length, on_completion_callback, run_trial):
         super().__init__(participant_id, mode, on_completion_callback)
         # Create a new StreamInfo
+        self.model = None
         info = StreamInfo(name='test_triggers', type='Markers', channel_count=1, channel_format='string',
                           source_id='test_triggers_id')
 
@@ -41,15 +39,19 @@ class FishingMultitasking(CognitiveFunctions):
         else:
             self.gui_terminal.write_text("**** Calibration process terminated ****")
             self.gui_terminal.write_text("Creating model for patient")
-            model = ModelCreator(f"participants/{self.participant_id}/training.csv", self.participant_id, self.gui_terminal)
-            model.search_and_create_best_model()
-            model.save_model()
+            self.model = ModelCreator(f"participants/{self.participant_id}/training.csv", self.participant_id, self.gui_terminal)
+            self.model.search_and_create_best_model()
+            self.model.save_model()
+            self.winry = Winry(self.participant_id)
+            self.winry.start()
             self.trial_routine()
 
 
     def trial_routine(self):
         self.gui_terminal.clear_text()
-        self.gui_terminal.write_text("**** Routine session ****")
+        self.gui_terminal.write_text("******** Routine session ********")
+        self.gui_terminal.write_text("**** Model in use ****")
+        self.gui_terminal.write_text(self.model.get_best_model().summary())
         self.gui_terminal.write_text("sending: start_session:fishing")
         self.data_writer.set_state("start_session:fishing")
 
@@ -58,7 +60,7 @@ class FishingMultitasking(CognitiveFunctions):
             self.__fishing_trial_routine()
         self.data_writer.set_state("end_session:fishing")
         self.gui_terminal.write_text("sending: end_session:fishing")
-        self.gui_terminal.write_text("End fishing Calibration routine")
+        self.gui_terminal.write_text("End fishing routine")
         self.stop_event.set()
 
         directory = os.path.join('participants/', self.participant_id)
@@ -67,6 +69,7 @@ class FishingMultitasking(CognitiveFunctions):
         shutil.copyfile(source_filename, str('participants/' + self.participant_id + '/' + 'fishing.csv'))
         self.filename_training =  'participants/' + self.participant_id + '/' + 'fishing.csv'
         self.gui_terminal.write_text(f'File {source_filename} has been copied as fishing.csv')
+        self.winry.stop()
 
     def __fishing_trial_routine(self):
         # Resolviendo el stream de 'testtriggers2' para recibir triggers
@@ -172,3 +175,6 @@ class FishingMultitasking(CognitiveFunctions):
         else:
             self.gui_terminal.write_text('No CSV file containing "fishing" found in the directory')
         return source
+
+    def get_winry(self):
+        return self.winry
