@@ -16,10 +16,11 @@ class StatusPanel(tk.Frame):
         self.terminal_frame.config(state='disabled')  # Make the Text widget read-only
 
     def write_text(self, text):
-        self.terminal_frame.config(state='normal')  # Enable the Text widget for modification
-        self.terminal_frame.insert(tk.END, text + "\n")
-        self.terminal_frame.see(tk.END)  # Autoscroll to the bottom
-        self.terminal_frame.config(state='disabled')  # Make the Text widget read-only again
+        if text is not None:
+           self.terminal_frame.config(state='normal')  # Enable the Text widget for modification
+           self.terminal_frame.insert(tk.END, text + "\n")
+           self.terminal_frame.see(tk.END)  # Autoscroll to the bottom
+           self.terminal_frame.config(state='disabled')  # Make the Text widget read-only again
 
     def clear_text(self):
         self.terminal_frame.config(state='normal')  # Enable the Text widget for modification
