@@ -9,20 +9,23 @@ from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 import matplotlib.pyplot as plt
+from tensorflow.python.keras.backend import dtype
+
 
 class ModelCreator:
     def __init__(self, df, participant_id, terminal):
         self.best_model = None
         self.participant_id = participant_id
         self.terminal = terminal
+        # pd.set_option('future.no_silent_downcasting', True)
         df = pd.read_csv(df)
-        df['Countdown Type'] = df['Countdown Type'].replace({
-            'Rest': 0,
-            'Left Arm Flex': 1,
-            'Left Arm Extend': 2,
-            'Right Arm Flex': 3,
-            'Right Arm Extend': 4
-        })
+        # df['Countdown Type'] = df['Countdown Type'].replace({
+        #     'Rest': 0,
+        #     'Left Arm Flex': 1,
+        #     'Left Arm Extend': 2,
+        #     'Right Arm Flex': 3,
+        #     'Right Arm Extend': 4
+        # })
 
         # Step 2: Split data into features and labels
         X_completo = df[
@@ -33,7 +36,6 @@ class ModelCreator:
              'Gamma 1', 'Gamma 2', 'Gamma 3', 'Gamma 4', 'Gamma 5', 'Gamma 6', 'Gamma 7', 'Gamma 8']]
 
         y = df['Countdown Type']
-
         # Step 3: Split data into training and testing sets with more randomness
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X_completo, y, test_size=0.2, random_state=42, shuffle=True)
 

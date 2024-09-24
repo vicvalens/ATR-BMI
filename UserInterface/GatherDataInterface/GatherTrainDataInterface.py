@@ -50,15 +50,16 @@ class CountdownApp(Toplevel):
         self.label.pack(pady=20)
 
         self.current_countdown_type = None
+        self.number_cycle = None
         self.inlet = None
         self.setup_lsl()
 
         self.countdown_phases = [
-            ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を考えてみてください"),
-            ("Left Arm Flex", "Flex your left arm", "左手を曲げてください"),
-            ("Left Arm Extend", "Extend your left arm", "左手を伸ばしてください"),
-            ("Right Arm Flex", "Flex your right arm", "右手を曲げてください"),
-            ("Right Arm Extend", "Extend your right arm", "右手を伸ばしてください")
+            ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を考えてみてください", 0),
+            ("Left Arm Flex", "Flex your left arm", "左手を曲げてください", 1),
+            ("Left Arm Extend", "Extend your left arm", "左手を伸ばしてください", 2),
+            ("Right Arm Flex", "Flex your right arm", "右手を曲げてください", 3),
+            ("Right Arm Extend", "Extend your right arm", "右手を伸ばしてください", 4)
         ]
 
         self.current_phase = -1  # Start with -1 to account for preparation phase
@@ -93,7 +94,7 @@ class CountdownApp(Toplevel):
             if self.current_countdown_type:
                 sample, timestamp = self.inlet.pull_sample()
                 self.csv_writer.writerow([datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f'),
-                                          self.cycle_count, self.current_countdown_type] + sample)
+                                          self.cycle_count, self.number_cycle] + sample)
             time.sleep(0.1)
 
     def next_phase(self):
@@ -107,10 +108,11 @@ class CountdownApp(Toplevel):
             self.cycle_label.config(text=f"Cycle: {self.cycle_count}/{self.max_cycles}")
             self.japanese_cycle_label.config(text=f"循環: {self.cycle_count}/{self.max_cycles}")
 
-        phase_name, instruction, japanese_instruction = self.countdown_phases[self.current_phase]
+        phase_name, instruction, japanese_instruction, cycle_number = self.countdown_phases[self.current_phase]
         self.current_countdown_type = phase_name
         self.legend_label.config(text=instruction)
         self.japanese_legend_label.config(text=japanese_instruction)
+        self.number_cycle = cycle_number
         self.countdown(5, self.next_phase)
 
     def countdown(self, count, next_function):
