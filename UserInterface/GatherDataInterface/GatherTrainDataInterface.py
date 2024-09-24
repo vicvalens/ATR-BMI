@@ -18,7 +18,7 @@ class CountdownApp(Toplevel):
         self.center_window(self)
 
         self.cycle_count = 1
-        self.max_cycles = 10
+        self.max_cycles = 5
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(os.path.dirname(current_dir))
