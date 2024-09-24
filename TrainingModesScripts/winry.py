@@ -26,7 +26,7 @@ class Winry:
         self.model = load_model(model_file_path)
         self.expected_input_shape = self.model.input_shape[1]
 
-        scaler_file_path = f'/Users/mnecoea/PycharmProjects/ATR-BMI/Models/scaler.joblib'
+        scaler_file_path = f'Models/scaler.joblib'
         self.scaler = joblib.load(scaler_file_path)
 
     def wavelet_transform(self, data):
