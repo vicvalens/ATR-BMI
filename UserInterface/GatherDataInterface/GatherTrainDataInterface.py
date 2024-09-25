@@ -1,13 +1,16 @@
 import tkinter as tk
 import csv
 from tkinter import Toplevel
-
+from PIL import Image, ImageTk
 import pylsl
 from pylsl import StreamInlet
 import time
 from datetime import datetime
 import os
 import threading
+
+from tensorflow.python.distribute.device_util import current
+
 
 class CountdownApp(Toplevel):
     def __init__(self, participant_id):
@@ -39,7 +42,6 @@ class CountdownApp(Toplevel):
         self.japanese_cycle_label = tk.Label(self, text=f"循環: {self.cycle_count}/{self.max_cycles}", font=("Century Gothic", 14))
         self.japanese_cycle_label.pack(anchor='ne', padx=5, pady=5)
 
-
         self.legend_label = tk.Label(self, text="Relax your muscles, try to think about your tongue", font=("Century Gothic", 44))
         self.legend_label.pack(pady=5)
 
@@ -49,17 +51,29 @@ class CountdownApp(Toplevel):
         self.label = tk.Label(self, text="5", font=("Century Gothic", 150))
         self.label.pack(pady=20)
 
+        # Store image objects as instance variables
+        self.left_extend_image = self.create_image('Assets/ExtendLeft.png')
+        self.left_flex_image = self.create_image('Assets/FlexLeft.png')
+        self.right_extend_image = self.create_image('Assets/ExtendRight.png')
+        self.right_flex_image = self.create_image('Assets/FlexRight.png')
+
+        # Create image labels but don't pack them yet
+        self.left_extend_guide_label = tk.Label(self, image=self.left_extend_image)
+        self.left_flex_guide_label = tk.Label(self, image=self.left_flex_image)
+        self.right_extend_guide_label = tk.Label(self, image=self.right_extend_image)
+        self.right_flex_guide_label = tk.Label(self, image=self.right_flex_image)
+
         self.current_countdown_type = None
         self.number_cycle = None
         self.inlet = None
         self.setup_lsl()
 
         self.countdown_phases = [
-            ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を考えてみてください", 0),
-            ("Left Arm Flex", "Flex your left arm", "左手を曲げてください", 1),
-            ("Left Arm Extend", "Extend your left arm", "左手を伸ばしてください", 2),
-            ("Right Arm Flex", "Flex your right arm", "右手を曲げてください", 3),
-            ("Right Arm Extend", "Extend your right arm", "右手を伸ばしてください", 4)
+            ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を想像してみてください", 0),
+            ("Left Arm Flex", "Imagine you flex your left arm", "左手を曲げるのを想像してください", 1),
+            ("Left Arm Extend", "Imagine you extend your left arm", "左手を伸ばすのを想像してください", 2),
+            ("Right Arm Flex", "Imagine you flex your right arm", "右手を曲げるのを想像してください", 3),
+            ("Right Arm Extend", "Imagine you extend your right arm", "右手を伸ばすのを想像してください", 4)
         ]
 
         self.current_phase = -1  # Start with -1 to account for preparation phase
@@ -68,6 +82,27 @@ class CountdownApp(Toplevel):
         self.data_thread.start()
 
         self.start_preparation()
+
+    def create_image(self, image_path):
+        image_size = (500, 500)
+        image = Image.open(image_path)
+        image = image.resize(image_size)
+        return ImageTk.PhotoImage(image)
+
+    def update_displayed_image(self):
+        # Unpack all images first
+        for label in [self.left_extend_guide_label, self.left_flex_guide_label,
+                      self.right_extend_guide_label, self.right_flex_guide_label]:
+            label.pack_forget()
+        # Then pack the correct image based on the current phase
+        if self.current_phase == 1:  # Left Arm Flex
+            self.left_flex_guide_label.pack(side='left', anchor='ne', padx=5, pady=5)
+        elif self.current_phase == 2:  # Left Arm Extend
+            self.left_extend_guide_label.pack(side='left', anchor='ne', padx=5, pady=5)
+        elif self.current_phase == 3:  # Right Arm Flex
+            self.right_flex_guide_label.pack(side='right', anchor='ne', padx=5, pady=5)
+        elif self.current_phase == 4:  # Right Arm Extend
+            self.right_extend_guide_label.pack(side='right', anchor='ne', padx=5, pady=5)
 
     def start_preparation(self):
         self.legend_label.config(text="Prepare for the test")
@@ -99,6 +134,8 @@ class CountdownApp(Toplevel):
 
     def next_phase(self):
         self.current_phase += 1
+        self.update_displayed_image()
+
         if self.current_phase >= len(self.countdown_phases):
             self.cycle_count += 1
             if self.cycle_count > self.max_cycles:
@@ -121,7 +158,6 @@ class CountdownApp(Toplevel):
             self.after(1000, self.countdown, count - 1, next_function)
         else:
             self.after(100, next_function)  # Short delay before starting next phase
-
 
     def finish_protocol(self):
         self.legend_label.config(text="Training completed. Terminating...!")
