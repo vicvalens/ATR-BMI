@@ -48,7 +48,7 @@ class CountdownApp(Toplevel):
         self.japanese_legend_label = tk.Label(self, text="力を抜いて、舌を考えてみてください", font=("Century Gothic", 44))
         self.japanese_legend_label.pack(pady=50)
 
-        self.label = tk.Label(self, text="5", font=("Century Gothic", 150))
+        self.label = tk.Label(self, text="5", font=("Century Gothic", 100))
         self.label.pack(pady=20)
 
         # Store image objects as instance variables
@@ -84,7 +84,7 @@ class CountdownApp(Toplevel):
         self.start_preparation()
 
     def create_image(self, image_path):
-        image_size = (500, 500)
+        image_size = (350, 350)
         image = Image.open(image_path)
         image = image.resize(image_size)
         return ImageTk.PhotoImage(image)
@@ -96,21 +96,37 @@ class CountdownApp(Toplevel):
             label.pack_forget()
         # Then pack the correct image based on the current phase
         if self.current_phase == 1:  # Left Arm Flex
-            self.left_flex_guide_label.pack(side='left', anchor='ne', padx=5, pady=5)
+            self.left_flex_guide_label.pack(side='left', anchor='ne', padx=450, pady=10)
         elif self.current_phase == 2:  # Left Arm Extend
-            self.left_extend_guide_label.pack(side='left', anchor='ne', padx=5, pady=5)
+            self.left_extend_guide_label.pack(side='left', anchor='ne', padx=450, pady=10)
         elif self.current_phase == 3:  # Right Arm Flex
-            self.right_flex_guide_label.pack(side='right', anchor='ne', padx=5, pady=5)
+            self.right_flex_guide_label.pack(side='right', anchor='ne', padx=450, pady=10)
         elif self.current_phase == 4:  # Right Arm Extend
-            self.right_extend_guide_label.pack(side='right', anchor='ne', padx=5, pady=5)
+            self.right_extend_guide_label.pack(side='right', anchor='ne', padx=450, pady=10)
 
     def start_preparation(self):
         self.legend_label.config(text="Prepare for the test")
         self.japanese_legend_label.config(text="テストの準備をしてください")
-        self.countdown(5, self.start_protocol)
+        # self.countdown(5, self.start_protocol)
+        self.label.config(text="")  # Limpia cualquier texto en la etiqueta del contador
+        self.bind('<Return>', self.on_enter_pressed)  # Espera a que se presione Enter
+
+    def on_enter_pressed(self, event):
+        self.unbind('<Return>')  # Desvincula el evento para que no se llame más de una vez
+        self.pre_cycle_timer(10)  # Añade un temporizador de 10 segundos antes de iniciar el protocolo
+    
+    def pre_cycle_timer(self, count):
+        self.label.config(text=str(count))
+        if count > 0:
+            self.after(1000, self.pre_cycle_timer, count - 1)
+        else:
+            self.start_protocol()
 
     def start_protocol(self):
-        self.next_phase()
+        self.legend_label.config(text="Starting cycles...")
+        self.japanese_legend_label.config(text="循環を開始します...")
+        self.label.config(text="")  # Vacía el texto del contador
+        self.after(3000, self.next_phase)  # Breve retraso antes de iniciar el primer ciclo
 
     def center_window(self, win):
         win.update_idletasks()
@@ -150,7 +166,7 @@ class CountdownApp(Toplevel):
         self.legend_label.config(text=instruction)
         self.japanese_legend_label.config(text=japanese_instruction)
         self.number_cycle = cycle_number
-        self.countdown(5, self.next_phase)
+        self.countdown(10, self.next_phase)
 
     def countdown(self, count, next_function):
         self.label.config(text=str(count))
