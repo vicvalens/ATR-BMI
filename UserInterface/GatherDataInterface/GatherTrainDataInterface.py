@@ -13,7 +13,7 @@ from tensorflow.python.distribute.device_util import current
 
 
 class CountdownApp(Toplevel):
-    def __init__(self, participant_id):
+    def __init__(self, participant_id, model_type):
         super().__init__()
         self.title("EEG Data Acquisition Protocol - Motor Imagery")
         # self.attributes("-fullscreen", True) # Does not work in macOS maybe in windows there's no problem
@@ -67,14 +67,21 @@ class CountdownApp(Toplevel):
         self.number_cycle = None
         self.inlet = None
         self.setup_lsl()
-
-        self.countdown_phases = [
-            ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を想像してみてください", 0),
-            ("Left Arm Flex", "Imagine you flex your left arm", "左手を曲げるのを想像してください", 1),
-            ("Left Arm Extend", "Imagine you extend your left arm", "左手を伸ばすのを想像してください", 2),
-            ("Right Arm Flex", "Imagine you flex your right arm", "右手を曲げるのを想像してください", 3),
-            ("Right Arm Extend", "Imagine you extend your right arm", "右手を伸ばすのを想像してください", 4)
-        ]
+        self.model_type = model_type
+        if model_type == "5 Classes model":
+            self.countdown_phases = [
+                ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を想像してみてください", 0),
+                ("Left Arm Flex", "Imagine you flex your left arm", "左手を曲げるのを想像してください", 1),
+                ("Left Arm Extend", "Imagine you extend your left arm", "左手を伸ばすのを想像してください", 2),
+                ("Right Arm Flex", "Imagine you flex your right arm", "右手を曲げるのを想像してください", 3),
+                ("Right Arm Extend", "Imagine you extend your right arm", "右手を伸ばすのを想像してください", 4)
+            ]
+        else:
+            self.countdown_phases = [
+                ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を想像してみてください", 0),
+                ("Move left arm", "Imagine you move your left arm", "左手を動き出すのを想像してください", 1),
+                ("Move right arm", "Imagine you move right arm", "右手を動き出すのを想像してください", 2)
+            ]
 
         self.current_phase = -1  # Start with -1 to account for preparation phase
         self.running = True
@@ -95,14 +102,20 @@ class CountdownApp(Toplevel):
                       self.right_extend_guide_label, self.right_flex_guide_label]:
             label.pack_forget()
         # Then pack the correct image based on the current phase
-        if self.current_phase == 1:  # Left Arm Flex
-            self.left_flex_guide_label.pack(side='left', anchor='ne', padx=450, pady=10)
-        elif self.current_phase == 2:  # Left Arm Extend
-            self.left_extend_guide_label.pack(side='left', anchor='ne', padx=450, pady=10)
-        elif self.current_phase == 3:  # Right Arm Flex
-            self.right_flex_guide_label.pack(side='right', anchor='ne', padx=450, pady=10)
-        elif self.current_phase == 4:  # Right Arm Extend
-            self.right_extend_guide_label.pack(side='right', anchor='ne', padx=450, pady=10)
+        if self.model_type == "5 Classes model":
+            if self.current_phase == 1:  # Left Arm Flex
+                self.left_flex_guide_label.pack(side='left', anchor='ne', padx=450, pady=10)
+            elif self.current_phase == 2:  # Left Arm Extend
+                self.left_extend_guide_label.pack(side='left', anchor='ne', padx=450, pady=10)
+            elif self.current_phase == 3:  # Right Arm Flex
+                self.right_flex_guide_label.pack(side='right', anchor='ne', padx=450, pady=10)
+            elif self.current_phase == 4:  # Right Arm Extend
+                self.right_extend_guide_label.pack(side='right', anchor='ne', padx=450, pady=10)
+        else:
+            if self.current_phase == 1:
+                self.left_flex_guide_label.pack(side='left', anchor='ne', padx=450, pady=10)
+            else:
+                self.right_flex_guide_label.pack(side='right', anchor='ne', padx=450, pady=10)
 
     def start_preparation(self):
         self.legend_label.config(text="Prepare for the test")

@@ -29,7 +29,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
         self.value_label = None
         self.information_label = None
         self.fishing_label = None
-
+        self.fishing_model_number_classes = tk.StringVar()
         self.__experiment_duration = tk.IntVar(value=5)
         self.__fishing_duration = tk.IntVar(value=5)
         self.terminal = terminal
@@ -74,8 +74,13 @@ class ConfirmationAndExperimentSettings(tk.Frame):
             self.information_label = 'Número de entrenamientos: '
             self.fishing_text = 'Número de Trials: '
             self.create_slider()
+            button_label = tk.Label(self.details_and_configuration_frame, text="Modelo a entrenar:", bg='#D3D3D3')
+            button_label.pack(side=tk.TOP)
+            options = ["5 Classes model", "3 Classes model"]
+            class_selector = ttk.Combobox(self.details_and_configuration_frame, values=options, state="readonly", textvariable=self.fishing_model_number_classes)
+            class_selector.pack(side=tk.TOP)
+            class_selector.current(0)
             self.create_start_button()
-
 
     def create_start_button(self):
         self.start_button = tk.Button(self.details_and_configuration_frame, text='Start experiment', fg='black', bg='#D3D3D3', height=5, width=15, command=self.start_experiment)
@@ -150,7 +155,7 @@ class ConfirmationAndExperimentSettings(tk.Frame):
             else:
                 self.experiment = FishingMultitasking(self.participant_id, self.mode, self.terminal,
                                                       self.__experiment_duration.get(), self.__fishing_duration.get(),
-                                                      self.on_experiment_completed, 'trial')
+                                                      self.on_experiment_completed, self.fishing_model_number_classes.get())
 
             self.on_experiment = True
             self.start_button.config(state=tk.DISABLED)

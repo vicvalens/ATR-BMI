@@ -12,7 +12,7 @@ from UserInterface.GatherDataInterface.GatherTrainDataInterface import Countdown
 
 
 class FishingMultitasking(CognitiveFunctions):
-    def __init__(self, participant_id, mode, gui_terminal, duration, routine_length, on_completion_callback, run_trial):
+    def __init__(self, participant_id, mode, gui_terminal, duration, routine_length, on_completion_callback, model_type):
         super().__init__(participant_id, mode, on_completion_callback)
         # Create a new StreamInfo
         self.model = None
@@ -28,18 +28,21 @@ class FishingMultitasking(CognitiveFunctions):
         self.gui_terminal = gui_terminal
         self.length_of_experiment = duration
         self.routine_length = routine_length
-        self.run_trial = run_trial
+        self.model_type = model_type
 
     def routine(self):
         self.gui_terminal.write_text("**** Launching Calibration process ****")
-        countdown = CountdownApp(self.participant_id)
+        self.is_writing_on = False
+        countdown = CountdownApp(self.participant_id, self.model_type)
         self.gui_terminal.write_text("Gathering training data...")
+        self.gui_terminal.write_text(self.model_type)
         while countdown.running:
             pass
         else:
+            self.is_writing_on = True
             self.gui_terminal.write_text("**** Calibration process terminated ****")
             self.gui_terminal.write_text("Creating model for patient")
-            self.model = ModelCreator(f"participants/{self.participant_id}/training.csv", self.participant_id, self.gui_terminal)
+            self.model = ModelCreator(f"participants/{self.participant_id}/training.csv", self.participant_id, self.gui_terminal, self.model_type)
             self.model.search_and_create_best_model()
             self.model.save_model()
             self.winry = Winry(self.participant_id)
@@ -57,7 +60,10 @@ class FishingMultitasking(CognitiveFunctions):
 
         for i in range(self.length_of_experiment):
             self.gui_terminal.write_text("----> Trial: " + str(i + 1))
-            self.__fishing_trial_routine()
+            if self.model_type == "5 Classes model":
+                self.__fishing_trial_routine_5_classes()
+            else:
+                self.__fishing_trial_routine_3_classes()
         self.data_writer.set_state("end_session:fishing")
         self.gui_terminal.write_text("sending: end_session:fishing")
         self.gui_terminal.write_text("End fishing routine")
@@ -71,7 +77,7 @@ class FishingMultitasking(CognitiveFunctions):
         self.gui_terminal.write_text(f'File {source_filename} has been copied as fishing.csv')
         self.winry.stop()
 
-    def __fishing_trial_routine(self):
+    def __begin_trial(self):
         # Resolviendo el stream de 'testtriggers2' para recibir triggers
         self.gui_terminal.write_text("Resolviendo stream de 'testtriggers2' para recibir triggers...")
         streams = pylsl.resolve_stream('name', 'testtriggers2')
@@ -79,8 +85,7 @@ class FishingMultitasking(CognitiveFunctions):
             self.gui_terminal.write_text("No se encontró el stream 'testtriggers2'.")
             return
 
-        inlet = pylsl.StreamInlet(streams[0])
-
+        self.inlet = pylsl.StreamInlet(streams[0])
         # Enviar trigger inicial de start_trial
         self.data_writer.set_state("start_trial")
         self.gui_terminal.write_text("sending: start_trial")
@@ -97,64 +102,7 @@ class FishingMultitasking(CognitiveFunctions):
         self.outlet.push_sample(["intro"])
         time.sleep(15)
 
-        # Función para verificar si el trigger recibido coincide con el esperado
-        def check_trigger(expected_trigger):
-            timeout = 15  # Tiempo máximo para esperar el trigger esperado (15 segundos)
-            start_time = time.time()
-
-            while time.time() - start_time < timeout:
-                trigger, _ = inlet.pull_sample(timeout=0.5)
-                if trigger:
-                    self.gui_terminal.write_text(f"Trigger recibido: {trigger[0]}")
-                    if trigger[0] == expected_trigger:
-                        return True  # Trigger coincide con el esperado
-            return False  # No se recibió el trigger esperado a tiempo
-
-        # Extensión del brazo derecho (RA)
-        if check_trigger("3"):
-            self.gui_terminal.write_text("Trigger coincide: lower_right_arm")
-            self.outlet.push_sample(["3"])
-            self.data_writer.set_state("lower_right_arm")
-        else:
-            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_right_arm forzado")
-            self.data_writer.set_state("lower_right_arm_forced")  # Enviar el trigger de todas formas
-            self.outlet.push_sample(["3"])
-        time.sleep(15)
-
-        # Flexión del brazo derecho (RA)
-        if check_trigger("2"):
-            self.gui_terminal.write_text("Trigger coincide: rise_right_arm")
-            self.outlet.push_sample(["2"])
-            self.data_writer.set_state("rise_right_arm")
-        else:
-            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_right_arm forzado")
-            self.data_writer.set_state("rise_right_arm_forced")  # Enviar el trigger de todas formas
-            self.outlet.push_sample(["2"])
-        time.sleep(15)
-
-        # Extensión del brazo izquierdo (LA)
-        if check_trigger("1"):
-            self.gui_terminal.write_text("Trigger coincide: lower_left_arm")
-            self.data_writer.set_state("lower_left_arm")
-            self.outlet.push_sample(["1"])
-        else:
-            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_left_arm forzado")
-            self.data_writer.set_state("lower_left_arm_forced")  # Enviar el trigger de todas formas
-            self.outlet.push_sample(["1"])
-        time.sleep(15)
-
-        # Flexión del brazo izquierdo (LA)
-        if check_trigger("0"):
-            self.gui_terminal.write_text("Trigger coincide: rise_left_arm")
-            self.data_writer.set_state("rise_left_arm")
-            self.outlet.push_sample(["0"])
-        else:
-            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_left_arm forzado")
-            self.data_writer.set_state("rise_left_arm_forced")  # Enviar el trigger de todas formas
-            self.outlet.push_sample(["0"])
-        time.sleep(15)
-
-        # Cerrar escena
+    def __end_trial(self):
         self.data_writer.set_state("close_scene")
         self.gui_terminal.write_text("sending: close_scene")
         self.outlet.push_sample(["close_scene"])
@@ -165,6 +113,100 @@ class FishingMultitasking(CognitiveFunctions):
         self.gui_terminal.write_text("sending: end_trial")
         self.outlet.push_sample(["end_trial"])
         time.sleep(5)
+
+    def check_trigger(self, expected_trigger):
+        timeout = 15  # Tiempo máximo para esperar el trigger esperado (15 segundos)
+        start_time = time.time()
+
+        while time.time() - start_time < timeout:
+            trigger, _ = self.inlet.pull_sample(timeout=0.5)
+            if trigger:
+                self.gui_terminal.write_text(f"Trigger recibido: {trigger[0]}")
+                if trigger[0] == expected_trigger:
+                    return True  # Trigger coincide con el esperado
+        return False  # No se recibió el trigger esperado a tiempo
+
+    def __fishing_trial_routine_3_classes(self):
+
+        self.__begin_trial()
+
+        # Movement of right arm (MR)
+        for _ in range(2):
+            if self.check_trigger("2"):
+                self.gui_terminal.write_text("Trigger coincide: move_right_arm")
+                self.outlet.push_sample(["2"])
+                self.data_writer.set_state("move_right_arm")
+            else:
+                self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: move_right_arm forzado")
+                self.data_writer.set_state("move_right_arm_forced")  # Enviar el trigger de todas formas
+                self.outlet.push_sample(["2"])
+            time.sleep(15)
+
+        # Movement of left arm (ML)
+        for _ in range(2):
+            if self.check_trigger("1"):
+                self.gui_terminal.write_text("Trigger coincide: move_left_arm")
+                self.data_writer.set_state("move_left_arm")
+                self.outlet.push_sample(["1"])
+            else:
+                self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: move_left_arm forzado")
+                self.data_writer.set_state("move_left_arm_forced")  # Enviar el trigger de todas formas
+                self.outlet.push_sample(["1"])
+            time.sleep(15)
+
+        self.__end_trial()
+
+    def __fishing_trial_routine_5_classes(self):
+
+        # Enviar trigger inicial de start_trial
+        self.__begin_trial()
+
+        # Extensión del brazo derecho (RA)
+        if self.check_trigger("3"):
+            self.gui_terminal.write_text("Trigger coincide: lower_right_arm")
+            self.outlet.push_sample(["3"])
+            self.data_writer.set_state("lower_right_arm")
+        else:
+            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_right_arm forzado")
+            self.data_writer.set_state("lower_right_arm_forced")  # Enviar el trigger de todas formas
+            self.outlet.push_sample(["3"])
+        time.sleep(15)
+
+        # Flexión del brazo derecho (RA)
+        if self.check_trigger("2"):
+            self.gui_terminal.write_text("Trigger coincide: rise_right_arm")
+            self.outlet.push_sample(["2"])
+            self.data_writer.set_state("rise_right_arm")
+        else:
+            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_right_arm forzado")
+            self.data_writer.set_state("rise_right_arm_forced")  # Enviar el trigger de todas formas
+            self.outlet.push_sample(["2"])
+        time.sleep(15)
+
+        # Extensión del brazo izquierdo (LA)
+        if self.check_trigger("1"):
+            self.gui_terminal.write_text("Trigger coincide: lower_left_arm")
+            self.data_writer.set_state("lower_left_arm")
+            self.outlet.push_sample(["1"])
+        else:
+            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: lower_left_arm forzado")
+            self.data_writer.set_state("lower_left_arm_forced")  # Enviar el trigger de todas formas
+            self.outlet.push_sample(["1"])
+        time.sleep(15)
+
+        # Flexión del brazo izquierdo (LA)
+        if self.check_trigger("0"):
+            self.gui_terminal.write_text("Trigger coincide: rise_left_arm")
+            self.data_writer.set_state("rise_left_arm")
+            self.outlet.push_sample(["0"])
+        else:
+            self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: rise_left_arm forzado")
+            self.data_writer.set_state("rise_left_arm_forced")  # Enviar el trigger de todas formas
+            self.outlet.push_sample(["0"])
+        time.sleep(15)
+
+        # Cerrar escena
+        self.__end_trial()
 
     def search_and_copy(self, directory):
         source = ""

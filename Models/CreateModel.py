@@ -13,19 +13,13 @@ from tensorflow.python.keras.backend import dtype
 
 
 class ModelCreator:
-    def __init__(self, df, participant_id, terminal):
+    def __init__(self, df, participant_id, terminal, model_type):
         self.best_model = None
         self.participant_id = participant_id
         self.terminal = terminal
+        self.model_type = model_type
         # pd.set_option('future.no_silent_downcasting', True)
         df = pd.read_csv(df)
-        # df['Countdown Type'] = df['Countdown Type'].replace({
-        #     'Rest': 0,
-        #     'Left Arm Flex': 1,
-        #     'Left Arm Extend': 2,
-        #     'Right Arm Flex': 3,
-        #     'Right Arm Extend': 4
-        # })
 
         # Step 2: Split data into features and labels
         X_completo = df[
@@ -53,7 +47,10 @@ class ModelCreator:
         model.add(
             Dense(neurons, input_dim=self.X_train_scaled.shape[1], kernel_initializer=init_mode, activation=activation))
         model.add(Dense(neurons // 2, kernel_initializer=init_mode, activation=activation))
-        model.add(Dense(5, kernel_initializer=init_mode, activation='softmax'))
+        if self.model_type == "5 Classes model":
+            model.add(Dense(5, kernel_initializer=init_mode, activation='softmax'))
+        else:
+            model.add(Dense(3, kernel_initializer=init_mode, activation='softmax'))
         model.compile(optimizer=optimizer, loss=tf.keras.losses.sparse_categorical_crossentropy, metrics=['accuracy'])
         return model
 

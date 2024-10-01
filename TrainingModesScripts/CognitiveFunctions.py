@@ -11,6 +11,7 @@ class CognitiveFunctions(ABC):
 
         self.routine_thread = None
         self.data_writer_thread = None
+        self.is_writing_on = True
         self.stop_event = threading.Event()
         self.on_completion_callback = on_completion_callback
 
@@ -47,7 +48,7 @@ class CognitiveFunctions(ABC):
             self.on_completion_callback()
 
     def data_writer_routine(self):
-        while not self.stop_event.is_set():
+        while not self.stop_event.is_set() and self.is_writing_on:
             self.data_writer.write_data()
             time.sleep(0.1)  # Add a small sleep to prevent busy-waiting
 
