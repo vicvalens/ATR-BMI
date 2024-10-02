@@ -48,9 +48,10 @@ class CognitiveFunctions(ABC):
             self.on_completion_callback()
 
     def data_writer_routine(self):
-        while not self.stop_event.is_set() and self.is_writing_on:
-            self.data_writer.write_data()
-            time.sleep(0.1)  # Add a small sleep to prevent busy-waiting
+        while not self.stop_event.is_set():
+            if self.is_writing_on:
+                self.data_writer.write_data()
+                time.sleep(0.1)  # Add a small sleep to prevent busy-waiting
 
         # Write one last time after the stop event is set
         self.data_writer.write_data()
