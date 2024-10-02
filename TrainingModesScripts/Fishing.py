@@ -127,18 +127,23 @@ class FishingMultitasking(CognitiveFunctions):
         return False  # No se recibió el trigger esperado a tiempo
 
     def __fishing_trial_routine_3_classes(self):
-
+        left_extended = False
+        right_extended = False
         self.__begin_trial()
 
         # Movement of right arm (MR)
         for _ in range(2):
             if self.check_trigger("2"):
                 self.gui_terminal.write_text("Trigger coincide: move_right_arm")
-                self.outlet.push_sample(["2"])
                 self.data_writer.set_state("move_right_arm")
             else:
                 self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: move_right_arm forzado")
                 self.data_writer.set_state("move_right_arm_forced")  # Enviar el trigger de todas formas
+            if not right_extended:
+                right_extended = True
+                self.outlet.push_sample(["3"])
+            else:
+                right_extended = False
                 self.outlet.push_sample(["2"])
             time.sleep(15)
 
@@ -147,11 +152,15 @@ class FishingMultitasking(CognitiveFunctions):
             if self.check_trigger("1"):
                 self.gui_terminal.write_text("Trigger coincide: move_left_arm")
                 self.data_writer.set_state("move_left_arm")
-                self.outlet.push_sample(["1"])
             else:
                 self.gui_terminal.write_text("No se recibió el trigger esperado. Enviando: move_left_arm forzado")
                 self.data_writer.set_state("move_left_arm_forced")  # Enviar el trigger de todas formas
+            if not left_extended:
+                left_extended = True
                 self.outlet.push_sample(["1"])
+            else:
+                left_extended = False
+                self.outlet.push_sample(["0"])
             time.sleep(15)
 
         self.__end_trial()
