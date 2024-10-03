@@ -45,7 +45,7 @@ class CountdownApp(Toplevel):
         self.legend_label = tk.Label(self, text="Relax your muscles, try to think about your tongue", font=("Century Gothic", 44))
         self.legend_label.pack(pady=5)
 
-        self.japanese_legend_label = tk.Label(self, text="力を抜いて、舌を考えてみてください", font=("Century Gothic", 44))
+        self.japanese_legend_label = tk.Label(self, text="力を抜いて、舌を想像してください", font=("Century Gothic", 44))
         self.japanese_legend_label.pack(pady=50)
 
         self.label = tk.Label(self, text="5", font=("Century Gothic", 100))
@@ -71,16 +71,16 @@ class CountdownApp(Toplevel):
         if model_type == "5 Classes model":
             self.countdown_phases = [
                 ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を想像してみてください", 0),
-                ("Left Arm Flex", "Imagine you flex your left arm", "左手を曲げるのを想像してください", 1),
-                ("Left Arm Extend", "Imagine you extend your left arm", "左手を伸ばすのを想像してください", 2),
-                ("Right Arm Flex", "Imagine you flex your right arm", "右手を曲げるのを想像してください", 3),
-                ("Right Arm Extend", "Imagine you extend your right arm", "右手を伸ばすのを想像してください", 4)
+                ("Left Arm Flex", "Imagine you flex your left arm", "左手が曲がるのを想像してください", 1),
+                ("Left Arm Extend", "Imagine you extend your left arm", "左手が伸びるのを想像してください", 2),
+                ("Right Arm Flex", "Imagine you flex your right arm", "右手が曲がるのを想像してください", 3),
+                ("Right Arm Extend", "Imagine you extend your right arm", "右手が伸びるのを想像してください", 4)
             ]
         else:
             self.countdown_phases = [
                 ("Rest", "Relax your muscles, try to think about your tongue", "力を抜いて、舌を想像してみてください", 0),
-                ("Move left arm", "Imagine you move your left arm", "左手を動き出すのを想像してください", 1),
-                ("Move right arm", "Imagine you move right arm", "右手を動き出すのを想像してください", 2)
+                ("Move left arm", "Imagine you move your left arm", "左手が動き出すのを想像してください", 1),
+                ("Move right arm", "Imagine you move right arm", "右手が動き出すのを想像してください", 2)
             ]
 
         self.current_phase = -1  # Start with -1 to account for preparation phase
@@ -137,7 +137,7 @@ class CountdownApp(Toplevel):
 
     def start_protocol(self):
         self.legend_label.config(text="Starting cycles...")
-        self.japanese_legend_label.config(text="循環を開始します...")
+        self.japanese_legend_label.config(text="サイクルを開始します...")
         self.label.config(text="")  # Vacía el texto del contador
         self.after(3000, self.next_phase)  # Breve retraso antes de iniciar el primer ciclo
 
