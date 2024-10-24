@@ -8,6 +8,7 @@ from TrainingModesScripts.EggAttention import EGGAttention
 from TrainingModesScripts.Fishing import FishingMultitasking
 from TrainingModesScripts.TheaterTrialRoutine import TheaterTrialRoutine
 from TrainingModesScripts.Mole import Mole
+from TrainingModesScripts.VendingMachine import VendingMachine
 from tkinter import messagebox
 
 class ConfirmationAndExperimentSettings(tk.Frame):
@@ -82,6 +83,16 @@ class ConfirmationAndExperimentSettings(tk.Frame):
             class_selector.current(0)
             self.create_start_button()
 
+    def vending_machine_menu(self):
+        if not self.on_experiment:
+            self.mode = 'VENDING_MACHINE'
+            self.clear_frame()
+            self.create_side_frame()
+            self.create_title('VendingMachine Visual Memory')
+            self.information_label = 'Numero de pruebas: '
+            self.create_slider()
+            self.create_start_button()
+
     def create_start_button(self):
         self.start_button = tk.Button(self.details_and_configuration_frame, text='Start experiment', fg='black', bg='#D3D3D3', height=5, width=15, command=self.start_experiment)
         self.start_button.pack(side='bottom', fill='x')
@@ -152,6 +163,9 @@ class ConfirmationAndExperimentSettings(tk.Frame):
             elif self.mode == 'MOLE':
                 self.experiment = Mole(self.participant_id, self.mode, self.terminal, self.__experiment_duration.get(),
                                        self.on_experiment_completed)
+            elif self.mode == 'VENDING_MACHINE':
+                self.experiment = VendingMachine(self.participant_id, self.mode, self.terminal,
+                                                 self.__experiment_duration.get(), self.on_experiment_completed)
             else:
                 self.experiment = FishingMultitasking(self.participant_id, self.mode, self.terminal,
                                                       self.__experiment_duration.get(), self.__fishing_duration.get(),

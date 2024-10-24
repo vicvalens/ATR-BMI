@@ -12,7 +12,8 @@ class LeftControlPanel(tk.Frame):
             ('Egg: Attention', ui_menu.egg_attention_menu),
             ('Theater: Working Memory', ui_menu.theater_memory_menu),
             ('Mole: Control and Inhibition', ui_menu.mole_control_inhibition_menu),
-            ('Fishing: Multitasking + BMI', ui_menu.fishing_multitasking_bmi_menu)
+            ('Fishing: Multitasking + BMI', ui_menu.fishing_multitasking_bmi_menu),
+            ('VendingMachine: Visual Memory', ui_menu.vending_machine_menu)
         ]
         self.option_buttons = []
         self.create_widgets()
