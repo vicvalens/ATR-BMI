@@ -34,7 +34,7 @@ class AuraSignalHandler:
             b_well_stream = pylsl.resolve_stream('name', 'bWell.Markers')
             if len(b_well_stream) != 0:
                 self.b_well_inlet = pylsl.StreamInlet(b_well_stream[0])
-                print("Conectado al stream 'bWell.Markers'")
+                # print("Conectado al stream 'bWell.Markers'")
             else:
                 print("No se encontró el stream 'bWell.Markers'")
         except Exception as e:

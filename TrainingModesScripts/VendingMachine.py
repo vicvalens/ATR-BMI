@@ -14,6 +14,7 @@ class VendingMachine(CognitiveFunctions):
         self.outlet = StreamOutlet(stream_info)
 
     def routine(self):
+        time.sleep(0.1)
         self.gui_terminal.clear_text()
         self.gui_terminal.write_text('Sending: start_trial')
         self.data_writer.set_state("start_session:vending_machine")
